@@ -36,7 +36,11 @@ concurrency:
 jobs:
   release:
     name: Build and publish
-    runs-on: macos-26
+    # Intel runner on purpose: jobs on the arm64 macos-26 runner sat unassigned
+    # until GitHub cancelled them ("not acquired by Runner ... after multiple
+    # attempts"). The build is universal either way. Switch back to macos-26
+    # once arm64 capacity recovers, as GitHub plans to retire the Intel images.
+    runs-on: macos-26-intel
     timeout-minutes: 60
     steps:
       - name: Check out
