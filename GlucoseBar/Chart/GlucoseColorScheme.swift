@@ -3,7 +3,7 @@
 import Foundation
 import SwiftUI
 
-public enum GlucoseColorScheme: String, CaseIterable, Identifiable, Codable, Hashable {
+public enum GlucoseColorScheme: String, CaseIterable, Identifiable, Codable, Hashable, Sendable {
     public var id: String { rawValue }
     case staticColor
     case dynamicColor

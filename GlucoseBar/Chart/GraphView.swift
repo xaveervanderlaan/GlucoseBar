@@ -8,6 +8,148 @@
 import Foundation
 import SwiftUI
 import Charts
+import Observation
+
+/// The reading currently under the mouse pointer.
+struct HoveredReading: Equatable, Sendable {
+    var date: Date
+    var value: Double
+    var trend: GlucoseEntry.GlucoseTrend
+}
+
+/// Hover state shared between the chart overlay and the headline.
+///
+/// Kept in its own observable object so that moving the mouse only
+/// re-renders the two small views that read it. Previously the hover values
+/// lived in `GraphView`'s `@State`, so every mouse move rebuilt all chart data
+/// and re-rendered every mark in the chart.
+@MainActor @Observable
+final class ChartHoverState {
+    var reading: HoveredReading?
+
+    func set(_ newValue: HoveredReading?) {
+        if reading != newValue {
+            reading = newValue
+        }
+    }
+}
+
+/// All data the chart needs, computed once per model change.
+struct GlucoseChartModel: Equatable, Sendable {
+    /// Actual readings, oldest first.
+    var glucose: [GraphEntry] = []
+    /// Forecast points within the forecast display window.
+    var forecasts: [GraphEntry] = []
+    var cone: [ConeSlice] = []
+
+    var showForecast = false
+    var forecastDisplay: ForecastDisplay = .lines
+    var forecastBoundary = Date()
+    var showLegend = false
+    var isLoop = false
+
+    var yDomain: ClosedRange<Double> = 0...1
+
+    var colorScheme: GlucoseColorScheme = .dynamicColor
+    var showHighThreshold = true
+    var showLowThreshold = true
+    var showTarget = true
+    var highThreshold: Double = 180
+    var lowThreshold: Double = 70
+    var target: Double = 100
+
+    var hasData: Bool { !glucose.isEmpty || !forecasts.isEmpty }
+
+    @MainActor
+    init(glucose g: Glucose, settings s: SettingsStore, now: Date = Date()) {
+        let extras = g.provider.GlucoseSourceExtras
+
+        let high = convertGlucose(s, glucose: s.highThreshold)
+        let low = convertGlucose(s, glucose: s.lowThreshold)
+        let colorTarget = convertGlucose(s, glucose: extras.glucoseTarget ?? s.glucoseTarget)
+
+        // Readings within the selected time frame. Duplicated timestamps are
+        // dropped so every point has a unique identity.
+        let earliestToInclude = now.addingTimeInterval(TimeInterval(-s.graphMinutes * 60))
+        var seenDates = Set<Date>()
+        var readings: [GraphEntry] = []
+        for entry in g.entries ?? [] where entry.date >= earliestToInclude {
+            guard seenDates.insert(entry.date).inserted else { continue }
+            let value = convertGlucose(s, glucose: entry.glucose)
+            let color = getDynamicGlucoseColor(
+                glucoseValue: Decimal(value),
+                highGlucoseColorValue: Decimal(high),
+                lowGlucoseColorValue: Decimal(low),
+                targetGlucose: Decimal(colorTarget),
+                glucoseColorScheme: s.glucoseColorScheme
+            )
+            readings.append(GraphEntry(date: entry.date, value: value, trend: entry.trend ?? .notComputable, delta: entry.changeRate ?? 0.0, color: color, forecastType: .none, glucoseType: entry.glucoseType))
+        }
+        readings.sort { $0.date < $1.date }
+
+        // Forecasts start at the time the AID enacted its last decision.
+        let forecastStart = extras.enactedAt ?? now
+        var allForecasts: [GraphEntry] = []
+        func appendForecast(_ values: [Int]?, color: Color, type: ForecastType) {
+            guard let values else { return }
+            for (i, value) in values.enumerated() {
+                let date = forecastStart.addingTimeInterval(TimeInterval(i * 5 * 60))
+                allForecasts.append(GraphEntry(date: date, value: convertGlucose(s, glucose: Double(value)), trend: .notComputable, delta: 0.0, color: color, forecastType: type))
+            }
+        }
+        appendForecast(extras.forecasts.zt, color: .purple, type: .zt)
+        appendForecast(extras.forecasts.uam, color: .orange, type: .uam)
+        appendForecast(extras.forecasts.cob, color: .yellow, type: .cob)
+        appendForecast(extras.forecasts.iob, color: .blue, type: .iob)
+        appendForecast(extras.forecasts.loop, color: .blue, type: .loop)
+
+        let forecastHorizon = now.addingTimeInterval(forecastDuration)
+        let visibleForecasts = allForecasts.filter { $0.date <= forecastHorizon }
+        let cone = calculateConeData(entries: allForecasts, now: now)
+
+        // Loop only has one forecast, so a cone doesn't make sense
+        let isLoop = extras.aid == .loop
+        let forecastDisplay: ForecastDisplay = isLoop ? .lines : s.aidChartForecastDisplay
+
+        // Y axis range: readings plus whatever forecast is drawn, but never
+        // tighter than the default range.
+        var values = readings.map(\.value)
+        if s.aidChartShowForecast {
+            switch forecastDisplay {
+            case .cone:
+                if let coneMax = cone.map(\.max).max(), coneMax > 0 {
+                    values.append(coneMax)
+                }
+            case .lines:
+                values.append(contentsOf: visibleForecasts.map(\.value))
+            }
+        }
+        let defaultMax = convertGlucose(s, glucose: 216.0)
+        let defaultMin = convertGlucose(s, glucose: 36.0)
+        let maxYMargin = convertGlucose(s, glucose: 36.0)
+        let maxY = values.max() ?? defaultMax
+        let minY = values.min() ?? defaultMin
+        let yLower = Swift.min(minY, defaultMin)
+        let yUpper = maxY >= defaultMax ? maxY + maxYMargin : defaultMax
+
+        self.glucose = readings
+        self.forecasts = visibleForecasts
+        self.cone = cone
+        self.showForecast = s.aidChartShowForecast
+        self.forecastDisplay = forecastDisplay
+        self.forecastBoundary = Swift.min(readings.last?.date ?? now, forecastHorizon)
+        self.showLegend = s.aidChartShowForecast && s.aidChartForecastDisplay == .lines
+        self.isLoop = isLoop
+        self.yDomain = yLower...Swift.max(yUpper, yLower + 1)
+        self.colorScheme = s.glucoseColorScheme
+        self.showHighThreshold = s.showHighThreshold
+        self.showLowThreshold = s.showLowThreshold
+        self.showTarget = s.showTarget
+        self.highThreshold = high
+        self.lowThreshold = low
+        self.target = convertGlucose(s, glucose: s.glucoseTarget)
+    }
+}
 
 struct GraphView: View {
 
@@ -15,111 +157,13 @@ struct GraphView: View {
     @EnvironmentObject var s: SettingsStore
     @EnvironmentObject var vs: ViewState
 
-    @State private var hoveredTime: Date?
-    @State private var hoveredValue: Double?
-    @State private var hoveredTrend: GlucoseEntry.GlucoseTrend?
-    @State private var hoveredDelta: Double?
-    @State private var isHovering: Bool = false
-    @State private var legends: [String : Color] = [:]
+    @State private var hover = ChartHoverState()
     @State private var isLoading: Bool = false
 
-    var gse: GlucoseSourceExtraProperties = GlucoseSourceExtraProperties()
+    @FocusState var buttonFocusState
 
     init(glucose: Glucose) {
         self.g = glucose
-        self.gse = glucose.provider.GlucoseSourceExtras
-    }
-
-    func getGraphData() -> [GraphEntry] {
-
-        let highThresholdRuleMark = Decimal(convertGlucose(s, glucose: s.highThreshold))
-        let lowThresholdRuleMark = Decimal(convertGlucose(s, glucose: s.lowThreshold))
-
-        var data: [GraphEntry] = [];
-        if let entries = g.entries {
-            let earliestToInclude = Date(timeIntervalSinceNow: TimeInterval(-s.graphMinutes*60))
-
-            for entry in entries {
-                if entry.date.timeIntervalSince(earliestToInclude) < 0 {
-                    continue
-                }
-
-                let glu = convertGlucose(s, glucose: entry.glucose)
-
-                var delta = 0.0
-                if let changeRate = entry.changeRate {
-                    delta = changeRate
-                }
-
-                var glucoseTarget = s.glucoseTarget
-                if let fetchedGlucoseTarget = g.provider.GlucoseSourceExtras.glucoseTarget {
-                    glucoseTarget = fetchedGlucoseTarget
-                }
-
-                let color = getDynamicGlucoseColor(glucoseValue: Decimal(convertGlucose(s, glucose: entry.glucose)), highGlucoseColorValue: highThresholdRuleMark, lowGlucoseColorValue: lowThresholdRuleMark, targetGlucose: Decimal(convertGlucose(s, glucose: glucoseTarget)), glucoseColorScheme: s.glucoseColorScheme)
-
-                data.append(GraphEntry(date: entry.date, value: glu, trend: entry.trend ?? .notComputable, delta: delta, color: color, forecastType: .none, glucoseType: entry.glucoseType))
-            }
-        }
-
-        let forecastStartDate = gse.enactedAt ?? Date()
-
-        if let zt = gse.forecasts.zt {
-            for i in 0..<zt.count {
-                let entry = zt[i]
-                let glu = convertGlucose(s, glucose: Double(entry))
-
-                let date = Calendar.current.date(byAdding: .minute, value: i * 5, to: forecastStartDate)!
-
-                data.append(GraphEntry(date: date, value: glu, trend: .notComputable, delta: 0.0, color: .purple, forecastType: .zt))
-            }
-        }
-
-        if let uam = gse.forecasts.uam {
-            for i in 0..<uam.count {
-                let entry = uam[i]
-                let glu = convertGlucose(s, glucose: Double(entry))
-
-                let date = Calendar.current.date(byAdding: .minute, value: i * 5, to: forecastStartDate)!
-
-                data.append(GraphEntry(date: date, value: glu, trend: .notComputable, delta: 0.0, color: .orange, forecastType: .uam))
-            }
-        }
-
-        if let cob = gse.forecasts.cob {
-            for i in 0..<cob.count {
-                let entry = cob[i]
-                let glu = convertGlucose(s, glucose: Double(entry))
-
-                let date = Calendar.current.date(byAdding: .minute, value: i * 5, to: forecastStartDate)!
-
-                data.append(GraphEntry(date: date, value: glu, trend: .notComputable, delta: 0.0, color: .yellow, forecastType: .cob))
-            }
-        }
-
-        if let iob = gse.forecasts.iob {
-            for i in 0..<iob.count {
-                let entry = iob[i]
-                let glu = convertGlucose(s, glucose: Double(entry))
-
-                let date = Calendar.current.date(byAdding: .minute, value: i * 5, to: forecastStartDate)!
-
-                data.append(GraphEntry(date: date, value: glu, trend: .notComputable, delta: 0.0, color: .blue, forecastType: .iob))
-            }
-        }
-
-        if let loop = gse.forecasts.loop {
-            for i in 0..<loop.count {
-                let entry = loop[i]
-                let glu = convertGlucose(s, glucose: Double(entry))
-
-                let date = Calendar.current.date(byAdding: .minute, value: i * 5, to: forecastStartDate)!
-
-                data.append(GraphEntry(date: date, value: glu, trend: .notComputable, delta: 0.0, color: .blue, forecastType: .iob))
-            }
-        }
-
-        return data
     }
 
     func reloadData() {
@@ -130,84 +174,36 @@ struct GraphView: View {
         }
     }
 
-    func changeTimeFrame(minutes: Int) -> [GraphEntry] {
+    func changeTimeFrame(minutes: Int) {
         s.graphMinutes = minutes
         s.save()
-        return getGraphData()
     }
 
-    func getMinMaxY(data: [GraphEntry]) -> (Double, Double, Double, Double) {
-        let defaultMaxGlucose = convertGlucose(s, glucose: 216.0)
-        let defaultMinGlucose = convertGlucose(s, glucose: 36.0)
-
-        var maxY = 0.0
-        var minY = 0.0
-
-        var entries: [GraphEntry] = []
-        let coneData = calculateConeData(entries: data)
-
-        for(_, entry) in data.enumerated() {
-            if entry.forecastType == .none {
-                entries.append(entry)
-            }
-        }
-
-        if s.aidChartShowForecast {
-            if s.aidChartForecastDisplay == .cone {
-                // Calculate highest entry from coneData
-                let maxConeData = coneData.1.max(by: {$0.v < $1.v})?.v ?? 0
-                if maxConeData > 0 {
-                    entries.append(GraphEntry(date: Date(), value: maxConeData, trend: GlucoseEntry.GlucoseTrend.flat, delta: 0, color: Color.blue, forecastType: .none))
-                }
-            }
-
-            if s.aidChartForecastDisplay == .lines {
-                for(_, entry) in data.enumerated() {
-                    if entry.forecastType != .none && entry.date <= Date(timeIntervalSinceNow: TimeInterval(forecastDuration)) {
-                        entries.append(entry)
-                    }
-                }
-            }
-        }
-
-        maxY = entries.max(by: {$0.value < $1.value})?.value ?? defaultMaxGlucose
-        minY = entries.min(by: {$0.value > $1.value})?.value ?? defaultMinGlucose
-        return (minY, maxY, defaultMinGlucose, defaultMaxGlucose)
+    /// `selectedTitle` / `title` are localization keys ("3 Hours" / "3").
+    @ViewBuilder
+    private func timeFrameButton(minutes: Int, selectedTitle: LocalizedStringKey, title: LocalizedStringKey) -> some View {
+        Button(s.graphMinutes == minutes ? selectedTitle : title) {
+            changeTimeFrame(minutes: minutes)
+            buttonFocusState = false
+        }.clipShape(Capsule()).buttonStyle(.bordered).focused($buttonFocusState)
     }
-
-    @FocusState var buttonFocusState
-    @FocusState var zenModeFocusState
 
     var body: some View {
-        var data = getGraphData()
-        let (minY, maxY, defaultMinGlucose, defaultMaxGlucose) = getMinMaxY(data: data)
-
-        let maxYMargin = convertGlucose(s, glucose: 36.0)
-
-        let highThresholdRuleMark = convertGlucose(s, glucose: s.highThreshold)
-        let lowThresholdRuleMark = convertGlucose(s, glucose: s.lowThreshold)
-        let targetRuleMark = convertGlucose(s, glucose: s.glucoseTarget)
-
-        let latestGlucoseTime = g.glucoseTime
-        let latestGlucose = convertGlucose(s, glucose: g.glucose)
-        let latestTrend = GlucoseEntry.GlucoseTrend(direction: g.trend) ?? .notComputable
-
-        let headlineTime = isHovering ? hoveredTime ?? latestGlucoseTime : latestGlucoseTime
-        let headlineGlucose = isHovering ? hoveredValue ?? latestGlucose : latestGlucose
-        let headlineTrend = isHovering ? hoveredTrend ?? latestTrend : latestTrend
-
+        let model = GlucoseChartModel(glucose: g, settings: s)
         let graphDataDuration = (-1 * (g.entries?.last?.date.timeIntervalSinceNow ?? 1) / 60 / 60).rounded()
-
-        // Loop only has one forecast, so a cone doesn't make sense
-        let forecastDisplay = g.provider.GlucoseSourceExtras.aid == .loop ? .lines : s.aidChartForecastDisplay
-        let legendList: KeyValuePairs<String, Color> = g.provider.GlucoseSourceExtras.aid == .loop ? ["Forecast": Color.blue] : ["UAM": Color.orange, "ZT": Color.purple, "IOB": Color.blue, "COB": Color.yellow]
 
         VStack {
             HStack {
-                VStack {
-                    Text("\(Text(headlineTime, format: .dateTime.hour().minute()))").font(.subheadline)
-                    Text("\(printFormattedGlucose(settings: s, glucose: headlineGlucose)) \(headlineTrend.arrows != "↔" ? headlineTrend.arrows : "")").font(.largeTitle)
-                }.padding(.leading, 25).padding(.top, 10)
+                GraphHeadline(
+                    hover: hover,
+                    latestTime: g.glucoseTime,
+                    latestGlucose: convertGlucose(s, glucose: g.glucose),
+                    // `g.trend` holds the arrow glyph, not the direction name,
+                    // so take the trend from the latest reading itself.
+                    latestTrend: g.entries?.first?.trend ?? .notComputable,
+                    unit: s.glucoseUnit
+                )
+                .padding(.leading, 25).padding(.top, 10)
 
                 // Currently, all three supported AIDs support these options.
                 if s.cgmProvider == .nightscout && g.provider.RemoteGlucoseSource != .null {
@@ -219,31 +215,11 @@ struct GraphView: View {
             }.padding()
 
             HStack {
-                if graphDataDuration >= 3 {
-                    Button(s.graphMinutes == 180 ? "3 Hours" : "3") {
-                        data = changeTimeFrame(minutes: 180)
-                        buttonFocusState = false
-                    }.clipShape(Capsule()).buttonStyle(.bordered).focused($buttonFocusState)
-                }
-                if graphDataDuration >= 6 {
-                    Button(s.graphMinutes == 360 ? "6 Hours" : "6") {
-                        data = changeTimeFrame(minutes: 360)
-                        buttonFocusState = false
-                    }.clipShape(Capsule()).buttonStyle(.bordered).focused($buttonFocusState)
-                }
-                if graphDataDuration >= 12 {
-                    Button(s.graphMinutes == 720 ? "12 Hours" : "12") {
-                        data = changeTimeFrame(minutes: 720)
-                        buttonFocusState = false
-                    }.clipShape(Capsule()).buttonStyle(.bordered).focused($buttonFocusState)
-                }
-                if graphDataDuration >= 24 {
-                    Button(s.graphMinutes == 1440 ? "24 Hours" : "24") {
-                        data = changeTimeFrame(minutes: 1440)
-                        buttonFocusState = false
-                    }.clipShape(Capsule()).buttonStyle(.bordered).focused($buttonFocusState)
-                }
-                if data.count > 0 {
+                if graphDataDuration >= 3 { timeFrameButton(minutes: 180, selectedTitle: "3 Hours", title: "3") }
+                if graphDataDuration >= 6 { timeFrameButton(minutes: 360, selectedTitle: "6 Hours", title: "6") }
+                if graphDataDuration >= 12 { timeFrameButton(minutes: 720, selectedTitle: "12 Hours", title: "12") }
+                if graphDataDuration >= 24 { timeFrameButton(minutes: 1440, selectedTitle: "24 Hours", title: "24") }
+                if model.hasData {
                     Spacer()
                     Button(action: {
                         reloadData()
@@ -263,100 +239,183 @@ struct GraphView: View {
                 }
             }.padding().frame(alignment: .leading)
 
-            Chart {
-                if s.glucoseColorScheme == .staticColor {
-                    if s.showHighThreshold {
-                        RuleMark(y: .value("High", highThresholdRuleMark)).foregroundStyle(.orange).lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
-                    }
-                    if s.showLowThreshold {
-                        RuleMark(y: .value("Low", lowThresholdRuleMark)).foregroundStyle(.red).lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
-                    }
-                } else if s.glucoseColorScheme == .dynamicColor {
-                    if s.showHighThreshold {
-                        RuleMark(y: .value("High", highThresholdRuleMark)).foregroundStyle(dynamicPurple).lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
-                    }
-                    if s.showLowThreshold {
-                        RuleMark(y: .value("Low", lowThresholdRuleMark)).foregroundStyle(dynamicRed).lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
-                    }
-                }
-
-                if s.showTarget {
-                    RuleMark(y: .value("Target", targetRuleMark)).foregroundStyle(.green).lineStyle(StrokeStyle(lineWidth: 1))
-                }
-
-
-                if s.aidChartShowForecast {
-                    DrawForecast(
-                        data: data,
-                        yMin: minY <= defaultMinGlucose ? minY : defaultMinGlucose,
-                        yMax: maxY >= defaultMaxGlucose ? (maxY + maxYMargin) : defaultMaxGlucose,
-                        forecastType: forecastDisplay
-                    )
-                }
-                DrawGlucose(data: data)
-
-                if let hoveredTime, let hoveredValue {
-                    PointMark(
-                        x: .value("Time", hoveredTime),
-                        y: .value("Glucose", hoveredValue)
-                    )
-                }
-            }
-            .chartYScale(domain: [minY <= defaultMinGlucose ? minY : defaultMinGlucose, maxY >= defaultMaxGlucose ? (maxY + maxYMargin) : defaultMaxGlucose])
-            .chartYAxis {
-                AxisMarks(values: .automatic(desiredCount:8)) {
-                    AxisValueLabel()
-                }
-            }
-            .chartXAxis {
-                AxisMarks(values: .automatic(desiredCount:6)) { value in
-                    if let date = value.as(Date.self) {
-                        AxisValueLabel {
-                            VStack(alignment: .leading) {
-                                Text(date, format: .dateTime.hour().minute())
-                            }
-                        }
-
-                        AxisGridLine()
-                        AxisTick()
-                    }
-                }
-            }.chartOverlay { (chartProxy: ChartProxy) in
-                Color.clear
-                    .onContinuousHover { phase in
-                        switch phase {
-                        case .active(let hoverLocation):
-                            let hTime = chartProxy.value(
-                                atX: hoverLocation.x, as: Date.self
-                            )
-
-                            // Do we have a minute that has a value in the data?
-                            data.forEach { entry in
-                                let date = entry.date
-                                let timeDiff = date.timeIntervalSince(hTime!)
-                                if timeDiff < 60 && timeDiff > 0 {
-                                    if entry.forecastType == .none {
-                                        hoveredValue = entry.value
-                                        hoveredTime = entry.date
-                                        hoveredTrend = entry.trend
-                                        hoveredDelta = entry.delta
-                                        isHovering = true
-                                    } else {
-                                        hoveredTime = nil
-                                        isHovering = false
-                                    }
-                                }
-                            }
-
-                        case .ended:
-                            hoveredTime = nil
-                            isHovering = false
-                        }
-                    }
-            }.chartForegroundStyleScale(legendList
-            ).chartLegend(s.aidChartShowForecast && s.aidChartForecastDisplay == .lines ? .visible : .hidden)
-            .padding()
+            GlucoseChart(model: model, hover: hover)
+                .equatable()
+                .padding()
         }
+    }
+}
+
+/// Current (or hovered) time, glucose value and trend above the chart.
+private struct GraphHeadline: View {
+    let hover: ChartHoverState
+    let latestTime: Date
+    let latestGlucose: Double
+    let latestTrend: GlucoseEntry.GlucoseTrend
+    let unit: GlucoseUnit
+
+    var body: some View {
+        let hovered = hover.reading
+        let time = hovered?.date ?? latestTime
+        let glucose = hovered?.value ?? latestGlucose
+        let trend = hovered?.trend ?? latestTrend
+
+        VStack {
+            Text("\(Text(time, format: .dateTime.hour().minute()))").font(.subheadline)
+            Text("\(formattedGlucose(glucose, unit: unit)) \(trend.arrows != "↔" ? trend.arrows : "")").font(.largeTitle)
+        }
+    }
+}
+
+/// The chart itself. Equatable so it's only re-rendered when its data changes,
+/// not on hover or unrelated parent updates.
+private struct GlucoseChart: View, Equatable {
+    let model: GlucoseChartModel
+    let hover: ChartHoverState
+
+    nonisolated static func == (lhs: GlucoseChart, rhs: GlucoseChart) -> Bool {
+        lhs.model == rhs.model && lhs.hover === rhs.hover
+    }
+
+    private var legend: KeyValuePairs<String, Color> {
+        model.isLoop
+            ? ["Forecast": Color.blue]
+            : ["UAM": Color.orange, "ZT": Color.purple, "IOB": Color.blue, "COB": Color.yellow]
+    }
+
+    var body: some View {
+        Chart {
+            if model.colorScheme == .staticColor {
+                if model.showHighThreshold {
+                    RuleMark(y: .value("High", model.highThreshold)).foregroundStyle(.orange).lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
+                }
+                if model.showLowThreshold {
+                    RuleMark(y: .value("Low", model.lowThreshold)).foregroundStyle(.red).lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
+                }
+            } else if model.colorScheme == .dynamicColor {
+                if model.showHighThreshold {
+                    RuleMark(y: .value("High", model.highThreshold)).foregroundStyle(dynamicPurple).lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
+                }
+                if model.showLowThreshold {
+                    RuleMark(y: .value("Low", model.lowThreshold)).foregroundStyle(dynamicRed).lineStyle(StrokeStyle(lineWidth: 1, dash: [5]))
+                }
+            }
+
+            if model.showTarget {
+                RuleMark(y: .value("Target", model.target)).foregroundStyle(.green).lineStyle(StrokeStyle(lineWidth: 1))
+            }
+
+            if model.showForecast {
+                DrawForecast(
+                    forecasts: model.forecasts,
+                    cone: model.cone,
+                    boundary: model.forecastBoundary,
+                    yMin: model.yDomain.lowerBound,
+                    yMax: model.yDomain.upperBound,
+                    forecastType: model.forecastDisplay
+                )
+            }
+            DrawGlucose(data: model.glucose)
+        }
+        .chartYScale(domain: model.yDomain)
+        .chartYAxis {
+            AxisMarks(values: .automatic(desiredCount: 8)) {
+                AxisValueLabel()
+            }
+        }
+        .chartXAxis {
+            AxisMarks(values: .automatic(desiredCount: 6)) { value in
+                if let date = value.as(Date.self) {
+                    AxisValueLabel {
+                        VStack(alignment: .leading) {
+                            Text(date, format: .dateTime.hour().minute())
+                        }
+                    }
+
+                    AxisGridLine()
+                    AxisTick()
+                }
+            }
+        }
+        .chartOverlay { proxy in
+            GeometryReader { geometry in
+                ChartHoverLayer(proxy: proxy, geometry: geometry, readings: model.glucose, hover: hover)
+            }
+        }
+        .chartForegroundStyleScale(legend)
+        .chartLegend(model.showLegend ? .visible : .hidden)
+    }
+}
+
+/// Tracks the pointer over the plot area and draws the hovered point.
+private struct ChartHoverLayer: View {
+    let proxy: ChartProxy
+    let geometry: GeometryProxy
+    /// Readings sorted oldest first.
+    let readings: [GraphEntry]
+    let hover: ChartHoverState
+
+    /// Readings further than this from the pointer aren't highlighted.
+    private let maxDistance: TimeInterval = 5 * 60
+
+    private var plotOrigin: CGPoint {
+        proxy.plotFrame.map { geometry[$0].origin } ?? .zero
+    }
+
+    var body: some View {
+        let origin = plotOrigin
+
+        ZStack(alignment: .topLeading) {
+            Rectangle()
+                .fill(.clear)
+                .contentShape(Rectangle())
+                .onContinuousHover { phase in
+                    switch phase {
+                    case .active(let location):
+                        guard let date: Date = proxy.value(atX: location.x - origin.x) else {
+                            hover.set(nil)
+                            return
+                        }
+                        hover.set(nearestReading(to: date))
+                    case .ended:
+                        hover.set(nil)
+                    }
+                }
+
+            if let reading = hover.reading,
+               let position = proxy.position(for: (x: reading.date, y: reading.value)) {
+                Circle()
+                    .fill(Color.accentColor)
+                    .overlay(Circle().stroke(.background, lineWidth: 1.5))
+                    .frame(width: 9, height: 9)
+                    .position(x: origin.x + position.x, y: origin.y + position.y)
+                    .allowsHitTesting(false)
+            }
+        }
+    }
+
+    /// Binary search for the reading closest in time to `date`.
+    private func nearestReading(to date: Date) -> HoveredReading? {
+        guard !readings.isEmpty else { return nil }
+
+        var low = 0
+        var high = readings.count - 1
+        while low < high {
+            let mid = (low + high) / 2
+            if readings[mid].date < date {
+                low = mid + 1
+            } else {
+                high = mid
+            }
+        }
+
+        var best = readings[low]
+        if low > 0, abs(readings[low - 1].date.timeIntervalSince(date)) < abs(best.date.timeIntervalSince(date)) {
+            best = readings[low - 1]
+        }
+
+        guard abs(best.date.timeIntervalSince(date)) <= maxDistance else { return nil }
+        return HoveredReading(date: best.date, value: best.value, trend: best.trend)
     }
 }
 

@@ -51,7 +51,7 @@ public enum GlucoseSourceDevice: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
-public enum ForecastDisplay: String, CaseIterable, Identifiable {
+public enum ForecastDisplay: String, CaseIterable, Identifiable, Sendable {
     case cone
     case lines
     public var id: String { self.rawValue }

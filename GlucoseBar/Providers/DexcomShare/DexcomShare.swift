@@ -434,7 +434,7 @@ class DexcomShare: Provider, @unchecked Sendable {
 
         isAuthenticating = true
 
-        await self.setProviderIssue(nil)
+        self.setProviderIssue(nil)
 
         // Do we need a full refresh?
         if self.accountID == "" {

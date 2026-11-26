@@ -123,7 +123,7 @@ struct ChartSettingsView: View {
                         HStack {
                             Text("Show High Threshold Line", comment: "Label of the toggle to show the high glucose threshold line on the chart")
                             Spacer()
-                            Toggle(isOn: $s.showHighThreshold, label: {}).toggleStyle(.switch).tint(.blue).onChange(of: s.showHighThreshold, initial: true) {
+                            Toggle(isOn: $s.showHighThreshold, label: {}).toggleStyle(.switch).tint(.blue).onChange(of: s.showHighThreshold) {
                                 s.save()
                             }.fixedSize()
                                 .scaleEffect(0.7, anchor: .trailing)
@@ -132,7 +132,7 @@ struct ChartSettingsView: View {
                         HStack {
                             Text("Show Low Threshold Line", comment: "Label of the toggle to show the low glucose threshold line on the chart")
                             Spacer()
-                            Toggle(isOn: $s.showLowThreshold, label: {}).toggleStyle(.switch).tint(.blue).onChange(of: s.showLowThreshold, initial: true) {
+                            Toggle(isOn: $s.showLowThreshold, label: {}).toggleStyle(.switch).tint(.blue).onChange(of: s.showLowThreshold) {
                                 s.save()
                             }.fixedSize()
                                 .scaleEffect(0.7, anchor: .trailing)
@@ -141,7 +141,7 @@ struct ChartSettingsView: View {
                         HStack {
                             Text("Show Target Line", comment: "Label of the toggle to show target line on the chart")
                             Spacer()
-                            Toggle(isOn: $s.showTarget, label: {}).toggleStyle(.switch).tint(.blue).onChange(of: s.showTarget, initial: true) {
+                            Toggle(isOn: $s.showTarget, label: {}).toggleStyle(.switch).tint(.blue).onChange(of: s.showTarget) {
                                 s.save()
                             }.fixedSize()
                                 .scaleEffect(0.7, anchor: .trailing)

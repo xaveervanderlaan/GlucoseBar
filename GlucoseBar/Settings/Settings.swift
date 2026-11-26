@@ -11,7 +11,9 @@ import OSLog
 @MainActor
 class SettingsStore: ObservableObject, @unchecked Sendable {
 
-    private let settingsQueue = DispatchQueue(label: "tools.t1d.GlucoseBar.settings", attributes: .concurrent)
+    /// Raw JSON of the last loaded `menuBarItems`, so a reload only rebuilds
+    /// the item containers when the stored configuration actually changed.
+    private var loadedMenuBarItemsJSON: String?
 
     // MARK: - Source identity
 
@@ -125,77 +127,125 @@ class SettingsStore: ObservableObject, @unchecked Sendable {
     // MARK: - Load / Save
 
     func load() {
-        settingsQueue.sync {
-            loadInternal()
+        loadInternal()
+    }
+
+    // MARK: - Language-independent decoding
+
+    /// The CGM provider, chart color scheme and forecast style are stored as
+    /// their *translated* display name (e.g. "Nachtscout" in Dutch). Older
+    /// versions of the app only recognise that format, so it's still written
+    /// that way, but reading only matched the current language: after a
+    /// language change the value no longer matched and silently reset.
+    ///
+    /// This matches the stored string against the raw value, the translation
+    /// in every language the app ships, and translations that have since been
+    /// corrected (see `legacyTranslations`).
+    private static func decode<T>(_ stored: String?, _ options: [(value: T, rawValue: String, localizationKey: String)], fallback: T) -> T {
+        guard let stored, !stored.isEmpty else { return fallback }
+        for option in options where stored == option.rawValue
+            || translations(of: option.localizationKey).contains(stored)
+            || legacyTranslations[option.localizationKey, default: []].contains(stored) {
+            return option.value
+        }
+        return fallback
+    }
+
+    /// Translations that earlier versions shipped (and therefore saved) but
+    /// that were corrected later. Brand names like "Nightscout" had been
+    /// translated ("Nachtscout"), and a few words had the wrong meaning.
+    /// Settings saved with these must keep loading.
+    private static let legacyTranslations: [String: Set<String>] = [
+        "Nightscout": ["Nachtscout", "Explorador nocturno"],
+        "Dexcom Share": ["Dexcom Delen", "Compartir Dexcom", "Condivisione Dexcom", "Dela Dexcom", "Partajare Dexcom", "Udział Dexcom"],
+        "Static": ["statisch", "Stationnaire"],
+        "Cone": ["Bot", "Klatka", "Conu"],
+        "Lines": ["Regels"],
+    ]
+
+    private static var translationCache: [String: Set<String>] = [:]
+
+    /// Every translation the app ships for a source-language string.
+    private static func translations(of key: String) -> Set<String> {
+        if let cached = translationCache[key] {
+            return cached
+        }
+        var names: Set<String> = [key]
+        for localization in Bundle.main.localizations {
+            if let path = Bundle.main.path(forResource: localization, ofType: "lproj"),
+               let bundle = Bundle(path: path) {
+                names.insert(bundle.localizedString(forKey: key, value: key, table: nil))
+            }
+        }
+        translationCache[key] = names
+        return names
+    }
+
+    /// Assigns only when the value differs. Every assignment to a `@Published`
+    /// property notifies all observing views, even when the value is unchanged.
+    private func update<T: Equatable>(_ keyPath: ReferenceWritableKeyPath<SettingsStore, T>, _ value: T) {
+        if self[keyPath: keyPath] != value {
+            self[keyPath: keyPath] = value
         }
     }
 
     private func loadInternal() {
         let defaults = UserDefaults.standard
 
-        self.validSettings = defaults.bool(forKey: key("validSettings"))
-        self.debugMode = defaults.bool(forKey: "debugMode")
+        update(\.validSettings, defaults.bool(forKey: key("validSettings")))
+        update(\.debugMode, defaults.bool(forKey: "debugMode"))
 
         // Identity
-        self.sourceName = defaults.string(forKey: key("sourceName")) ?? "My CGM"
-        self.iconSymbol = defaults.string(forKey: key("iconSymbol")) ?? "person.fill"
-        self.showSourceIcon = defaults.bool(forKey: key("showSourceIcon"))
+        update(\.sourceName, defaults.string(forKey: key("sourceName")) ?? "My CGM")
+        update(\.iconSymbol, defaults.string(forKey: key("iconSymbol")) ?? "person.fill")
+        update(\.showSourceIcon, defaults.bool(forKey: key("showSourceIcon")))
         if let data = defaults.data(forKey: key("iconColor")),
            let color = try? JSONDecoder().decode(CodableColor.self, from: data) {
-            self.iconColor = color
+            update(\.iconColor, color)
         } else {
-            self.iconColor = .white
+            update(\.iconColor, .white)
         }
 
         // Nightscout
-        self.nsURL = defaults.string(forKey: key("nsURL")) ?? "https://my.nightscout.site"
-        self.nsSecret = defaults.string(forKey: key("nsSecret")) ?? ""
+        update(\.nsURL, defaults.string(forKey: key("nsURL")) ?? "https://my.nightscout.site")
+        update(\.nsSecret, defaults.string(forKey: key("nsSecret")) ?? "")
 
         // Dexcom Share
-        self.dxEmail = defaults.string(forKey: key("dxEmail")) ?? "your@email.com"
-        self.dxPassword = defaults.string(forKey: key("dxPassword")) ?? ""
+        update(\.dxEmail, defaults.string(forKey: key("dxEmail")) ?? "your@email.com")
+        update(\.dxPassword, defaults.string(forKey: key("dxPassword")) ?? "")
         let dxSrv = defaults.string(forKey: key("dxServer")) ?? DexcomServer.ous.url
         switch dxSrv {
-        case DexcomServer.ous.url:
-            self.dxServer = .ous
         case DexcomServer.us.url:
-            self.dxServer = .us
+            update(\.dxServer, .us)
         default:
-            self.dxServer = .ous
+            update(\.dxServer, .ous)
         }
 
         // Libre LinkUp
-        self.libreUsername = defaults.string(forKey: key("libreUsername")) ?? "your@email.com"
-        self.librePassword = defaults.string(forKey: key("librePassword")) ?? ""
-        self.libreConnectionID = defaults.string(forKey: key("libreConnectionID")) ?? ""
-        self.libreServer = defaults.string(forKey: key("libreServer")) ?? ""
+        update(\.libreUsername, defaults.string(forKey: key("libreUsername")) ?? "your@email.com")
+        update(\.librePassword, defaults.string(forKey: key("librePassword")) ?? "")
+        update(\.libreConnectionID, defaults.string(forKey: key("libreConnectionID")) ?? "")
+        update(\.libreServer, defaults.string(forKey: key("libreServer")) ?? "")
 
-        self.highThreshold = defaults.double(forKey: key("highThreshold"))
-        if (self.highThreshold == 0.0) {
-            self.highThreshold = 180
-        }
+        let storedHigh = defaults.double(forKey: key("highThreshold"))
+        update(\.highThreshold, storedHigh == 0.0 ? 180 : storedHigh)
 
-        self.lowThreshold = defaults.double(forKey: key("lowThreshold"))
-        if (self.lowThreshold == 0.0) {
-            self.lowThreshold = 70
-        }
+        let storedLow = defaults.double(forKey: key("lowThreshold"))
+        update(\.lowThreshold, storedLow == 0.0 ? 70 : storedLow)
 
-        self.graphMinutes = defaults.integer(forKey: key("graphMinutes"))
-        if (self.graphMinutes == 0) {
-            self.graphMinutes = 180
-        }
+        let storedGraphMinutes = defaults.integer(forKey: key("graphMinutes"))
+        update(\.graphMinutes, storedGraphMinutes == 0 ? 180 : storedGraphMinutes)
 
-        self.showTimeSince = defaults.bool(forKey: key("showTimeSince"))
-        self.showDelta = defaults.bool(forKey: key("showDelta"))
-        self.showMenuBarIcon = defaults.bool(forKey: key("showMenuBarIcon"))
+        update(\.showTimeSince, defaults.bool(forKey: key("showTimeSince")))
+        update(\.showDelta, defaults.bool(forKey: key("showDelta")))
+        update(\.showMenuBarIcon, defaults.bool(forKey: key("showMenuBarIcon")))
 
-        let jsonMenuBarItems = defaults.string(forKey: key("menuBarItems"))
-        if let jsonMenuBarItems = jsonMenuBarItems {
-            let decoder = JSONDecoder()
+        if let jsonMenuBarItems = defaults.string(forKey: key("menuBarItems")),
+           jsonMenuBarItems != loadedMenuBarItemsJSON {
+            loadedMenuBarItemsJSON = jsonMenuBarItems
             if let data = jsonMenuBarItems.data(using: .utf8) {
                 do {
-                    let decoded = try decoder.decode([MenuBarItemContainer].self, from: data)
-                    self.menuBarItems = decoded
+                    self.menuBarItems = try JSONDecoder().decode([MenuBarItemContainer].self, from: data)
                 } catch {
                     logger.dlog("Unable to decode menuBarItems object from json saved in UserDefaults: \(String(describing: error))", category: "settingsstore", level: .error)
                     self.menuBarItems = []
@@ -207,92 +257,70 @@ class SettingsStore: ObservableObject, @unchecked Sendable {
         if storedMenuBarItemSpacing == 0.0 {
             storedMenuBarItemSpacing = 8.0
         }
-        self.menuBarItemSpacing = CGFloat(storedMenuBarItemSpacing)
+        update(\.menuBarItemSpacing, CGFloat(storedMenuBarItemSpacing))
 
-        self.zenMode = defaults.bool(forKey: key("zenMode"))
+        update(\.zenMode, defaults.bool(forKey: key("zenMode")))
 
-        let cgmProv = defaults.string(forKey: key("cgmProvider")) ?? ""
-        switch cgmProv {
-        case CGMProvider.simulator.presentable:
-            self.cgmProvider = .simulator
-            self.logger.dlog("cgmProvider was simulator", category: "settingsstore", level: .default)
-        case CGMProvider.nightscout.presentable:
-            self.cgmProvider = .nightscout
-            self.logger.dlog("cgmProvider was nightscout", category: "settingsstore", level: .default)
-        case CGMProvider.dexcomshare.presentable:
-            self.cgmProvider = .dexcomshare
-            self.logger.dlog("cgmProvider was dexcomshare", category: "settingsstore", level: .default)
-        default:
-            self.cgmProvider = .null
-            self.logger.dlog("cgmProvider was default", category: "settingsstore", level: .default)
-        }
+        update(\.cgmProvider, Self.decode(defaults.string(forKey: key("cgmProvider")), [
+            (CGMProvider.simulator, CGMProvider.simulator.rawValue, "Simulator"),
+            (CGMProvider.nightscout, CGMProvider.nightscout.rawValue, "Nightscout"),
+            (CGMProvider.dexcomshare, CGMProvider.dexcomshare.rawValue, "Dexcom Share"),
+        ], fallback: .null))
+        self.logger.dlog("cgmProvider loaded as \(self.cgmProvider.rawValue)", category: "settingsstore", level: .default)
 
         let gunit = defaults.string(forKey: key("glucoseUnit")) ?? GlucoseUnit.mmoll.presentable
         switch gunit {
         case GlucoseUnit.mmoll.presentable:
-            self.glucoseUnit = .mmoll
-        case GlucoseUnit.mgdl.presentable:
-            self.glucoseUnit = .mgdl
+            update(\.glucoseUnit, .mmoll)
         default:
-            self.glucoseUnit = .mgdl
+            update(\.glucoseUnit, .mgdl)
         }
 
-        self.glucoseTarget = defaults.double(forKey: key("glucoseTarget"))
-        if self.glucoseTarget == 0 {
-            self.glucoseTarget = 100.0
-        }
+        let storedTarget = defaults.double(forKey: key("glucoseTarget"))
+        update(\.glucoseTarget, storedTarget == 0 ? 100.0 : storedTarget)
 
-        let colorScheme = defaults.string(forKey: key("glucoseColorScheme")) ?? GlucoseColorScheme.dynamicColor.displayName
-        switch colorScheme {
-        case GlucoseColorScheme.staticColor.displayName:
-            self.glucoseColorScheme = .staticColor
-        case GlucoseColorScheme.dynamicColor.displayName:
-            self.glucoseColorScheme = .dynamicColor
-        default:
-            self.glucoseColorScheme = .dynamicColor
-        }
+        update(\.glucoseColorScheme, Self.decode(defaults.string(forKey: key("glucoseColorScheme")), [
+            (GlucoseColorScheme.staticColor, GlucoseColorScheme.staticColor.rawValue, "Static"),
+            (GlucoseColorScheme.dynamicColor, GlucoseColorScheme.dynamicColor.rawValue, "Dynamic"),
+        ], fallback: .dynamicColor))
 
-        self.showHighThreshold = defaults.bool(forKey: key("showHighThreshold"))
-        self.showLowThreshold = defaults.bool(forKey: key("showLowThreshold"))
-        self.showTarget = defaults.bool(forKey: key("showTarget"))
+        update(\.showHighThreshold, defaults.bool(forKey: key("showHighThreshold")))
+        update(\.showLowThreshold, defaults.bool(forKey: key("showLowThreshold")))
+        update(\.showTarget, defaults.bool(forKey: key("showTarget")))
 
-        self.aidEnableIntegration = defaults.bool(forKey: key("trioEnableIntegration"))
+        update(\.aidEnableIntegration, defaults.bool(forKey: key("trioEnableIntegration")))
 
-        self.trioBarShowIOB = defaults.bool(forKey: key("trioBarShowIOB"))
-        self.trioBarShowCOB = defaults.bool(forKey: key("trioBarShowCOB"))
-        self.trioBarShowEventualGlucose = defaults.bool(forKey: key("trioBarShowEventualGlucose"))
+        update(\.trioBarShowIOB, defaults.bool(forKey: key("trioBarShowIOB")))
+        update(\.trioBarShowCOB, defaults.bool(forKey: key("trioBarShowCOB")))
+        update(\.trioBarShowEventualGlucose, defaults.bool(forKey: key("trioBarShowEventualGlucose")))
 
-        self.aidChartShowForecast = defaults.bool(forKey: key("trioChartShowForecast"))
-        let forecastDisplay = defaults.string(forKey: key("trioChartForecastDisplay")) ?? ForecastDisplay.lines.presentable
-        switch forecastDisplay {
-        case ForecastDisplay.lines.presentable:
-            self.aidChartForecastDisplay = .lines
-        case ForecastDisplay.cone.presentable:
-            self.aidChartForecastDisplay = .cone
-        default:
-            self.aidChartForecastDisplay = .lines
-        }
+        update(\.aidChartShowForecast, defaults.bool(forKey: key("trioChartShowForecast")))
+        update(\.aidChartForecastDisplay, Self.decode(defaults.string(forKey: key("trioChartForecastDisplay")), [
+            (ForecastDisplay.cone, ForecastDisplay.cone.rawValue, "Cone"),
+            (ForecastDisplay.lines, ForecastDisplay.lines.rawValue, "Lines"),
+        ], fallback: .lines))
 
-        self.aidChartShowIOB = defaults.bool(forKey: key("trioChartShowIOB"))
-        self.aidChartShowCOB = defaults.bool(forKey: key("trioChartShowCOB"))
-        self.aidChartShowEventualGlucose = defaults.bool(forKey: key("trioChartShowEventualGlucose"))
-        self.aidChartShowLoopStatus = defaults.bool(forKey: key("trioChartShowLoopStatus"))
+        update(\.aidChartShowIOB, defaults.bool(forKey: key("trioChartShowIOB")))
+        update(\.aidChartShowCOB, defaults.bool(forKey: key("trioChartShowCOB")))
+        update(\.aidChartShowEventualGlucose, defaults.bool(forKey: key("trioChartShowEventualGlucose")))
+        update(\.aidChartShowLoopStatus, defaults.bool(forKey: key("trioChartShowLoopStatus")))
     }
 
+    /// Persists the in-memory settings.
+    ///
+    /// This used to re-read every key from `UserDefaults` afterwards, which
+    /// re-assigned ~40 `@Published` properties and re-rendered every observing
+    /// view dozens of times per save (the name field saves on every keystroke).
+    /// The in-memory values are already the source of truth, so only
+    /// `validSettings` needs to be reflected back.
     func save() {
-        settingsQueue.async(flags: .barrier) { [weak self] in
-            Task { @MainActor in
-                guard let self = self else { return }
-                self.saveInternal()
-            }
-        }
-    }
-
-    private func saveInternal() {
         let defaults = UserDefaults.standard
         defaults.set(true, forKey: key("validSettings"))
-        defaults.set(self.debugMode, forKey: "debugMode")
+        // `debugMode` is a global flag written by `setDebugMode`; writing this
+        // source's (possibly stale) copy here could silently undo it.
         defaults.set(self.glucoseUnit.presentable, forKey: key("glucoseUnit"))
+        // Stored as the display name for compatibility with older versions;
+        // `decode` reads it back in any language.
         defaults.set(self.cgmProvider.presentable, forKey: key("cgmProvider"))
 
 
@@ -304,6 +332,7 @@ class SettingsStore: ObservableObject, @unchecked Sendable {
             let jsonMenuBarItems = try JSONEncoder().encode(self.menuBarItems)
             if let jsonString = String(data: jsonMenuBarItems, encoding: String.Encoding.utf8) {
                 defaults.set(jsonString, forKey: key("menuBarItems"))
+                loadedMenuBarItemsJSON = jsonString
             } else {
                 logger.dlog("Unable to convert encoded menuBarItems object to string", category: "settingsstore", level: .error)
             }
@@ -361,33 +390,24 @@ class SettingsStore: ObservableObject, @unchecked Sendable {
             defaults.set(data, forKey: key("iconColor"))
         }
 
-        defaults.synchronize()
-        self.loadInternal()
+        update(\.validSettings, true)
     }
 
     /// Removes all UserDefaults keys for this source and reloads (returns to
     /// fresh-install defaults). Called by `SourceManager` when the user tries to
     /// delete the last remaining source.
     func resetToDefaults() {
-        settingsQueue.async(flags: .barrier) { [weak self] in
-            Task { @MainActor in
-                guard let self = self else { return }
-                let prefix = "\(self.sourceId.uuidString)."
-                for k in UserDefaults.standard.dictionaryRepresentation().keys where k.hasPrefix(prefix) {
-                    UserDefaults.standard.removeObject(forKey: k)
-                }
-                self.loadInternal()
-            }
+        let prefix = "\(sourceId.uuidString)."
+        for k in UserDefaults.standard.dictionaryRepresentation().keys where k.hasPrefix(prefix) {
+            UserDefaults.standard.removeObject(forKey: k)
         }
+        loadedMenuBarItemsJSON = nil
+        menuBarItems = []
+        loadInternal()
     }
 
     func deleteCGMProvider() {
-        settingsQueue.async(flags: .barrier) { [weak self] in
-            Task { @MainActor in
-                guard let self = self else { return }
-                self.deleteCGMProviderInternal()
-            }
-        }
+        deleteCGMProviderInternal()
     }
 
     private func deleteCGMProviderInternal() {
@@ -427,7 +447,10 @@ class SettingsStore: ObservableObject, @unchecked Sendable {
         }
 
         self.logger.dlog("testCGMProvider calling verifyCredentials with provider: \(provider.type.presentable)", category: "settingsstore", level: .default)
-        return await provider.verifyCredentials()
+        let result = await provider.verifyCredentials()
+        // The test provider is throw-away; don't leave its socket connected.
+        provider.teardown()
+        return result
     }
 
     func resetApplication() async {

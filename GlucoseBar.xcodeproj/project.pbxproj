@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1C9D32E50F0A4B5188710489 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FD07E1B22AA4C509A1D6887 /* UpdateChecker.swift */; };
+		1C9D32E50F0A4B5188710489 /* DistributionChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FD07E1B22AA4C509A1D6887 /* DistributionChannel.swift */; };
 		830C4D062B0166F8000A0E87 /* DexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830C4D052B0166F8000A0E87 /* DexcomShare.swift */; };
 		831CC8332DE269C800E04180 /* GlucoseSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831CC8322DE269C500E04180 /* GlucoseSource.swift */; };
 		8330335D2FD6099E00C7ACF9 /* MenuBarExtraAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 8330335C2FD6099E00C7ACF9 /* MenuBarExtraAccess */; };
@@ -84,7 +84,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0FD07E1B22AA4C509A1D6887 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
+		0FD07E1B22AA4C509A1D6887 /* DistributionChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistributionChannel.swift; sourceTree = "<group>"; };
 		830C4D052B0166F8000A0E87 /* DexcomShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShare.swift; sourceTree = "<group>"; };
 		831CC8322DE269C500E04180 /* GlucoseSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseSource.swift; sourceTree = "<group>"; };
 		834156CB2EDCD41A004D9260 /* KeepAliveManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeepAliveManager.swift; sourceTree = "<group>"; };
@@ -377,7 +377,7 @@
 		9CA29E5CA3DB4D97A62431E0 /* Updates */ = {
 			isa = PBXGroup;
 			children = (
-				0FD07E1B22AA4C509A1D6887 /* UpdateChecker.swift */,
+				0FD07E1B22AA4C509A1D6887 /* DistributionChannel.swift */,
 			);
 			path = Updates;
 			sourceTree = "<group>";
@@ -506,7 +506,7 @@
 				83DB10F52E00B083001ADCE7 /* SeparatorView.swift in Sources */,
 				83DB10E22DFF3FD4001ADCE7 /* GlucoseDeltaView.swift in Sources */,
 				8384A3142E70B9E300C93DD8 /* AboutView.swift in Sources */,
-				1C9D32E50F0A4B5188710489 /* UpdateChecker.swift in Sources */,
+				1C9D32E50F0A4B5188710489 /* DistributionChannel.swift in Sources */,
 				838B25DF2BF0146F00D10DDA /* WelcomeView.swift in Sources */,
 				83A105112E0DE77600C4B7BD /* GlucoseValueSettingsView.swift in Sources */,
 				83DB10E42DFF3FDC001ADCE7 /* COBView.swift in Sources */,

@@ -14,7 +14,6 @@ struct MainAppView: View {
     @EnvironmentObject var g: Glucose
     @EnvironmentObject var s: SettingsStore
     @EnvironmentObject var vs: ViewState
-    @EnvironmentObject var uc: UpdateChecker
     @EnvironmentObject var sm: SourceManager
 
     let logger = Logger(subsystem: "tools.t1d.GlucoseBar", category: "main")
@@ -164,24 +163,7 @@ struct MainAppView: View {
                         QuitButton()
                     }
                 }
-                if case .outdated(let latestVersion, let latestBuild) = uc.status {
-                    VStack {
-                        HStack {
-                            Spacer()
-                            Button(action: {
-                                NSWorkspace.shared.open(uc.downloadURL)
-                            }) {
-                                Label("Update available: v\(latestVersion)\(uc.channel == .appStore ? "" : " (\(latestBuild))")", systemImage: "arrow.up.circle.fill")
-                                    .foregroundColor(.orange)
-                            }
-                            .buttonStyle(.plain)
-                            .focusEffectDisabled()
-                            .padding()
-                            .help("A new version of GlucoseBar is available.")
-                        }.offset(y: -10)
-                        Spacer()
-                    }
-                } else if !vs.isOnline {
+                if !vs.isOnline {
                     VStack {
                         HStack {
                             Spacer()
@@ -229,6 +211,5 @@ struct MainAppView: View {
     MainAppView()
         .environmentObject(Glucose(SettingsStore()))
         .environmentObject(SettingsStore())
-        .environmentObject(ViewState())
-        .environmentObject(UpdateChecker())
+        .environmentObject(ViewState.shared)
 }

@@ -7,41 +7,81 @@
 
 import SwiftUI
 
+/// The menu bar label. `MenuBarExtra` labels can't show colored, multi-part
+/// SwiftUI content, so the configured items are rendered into a bitmap.
+///
+/// Rendering is comparatively expensive, so it only happens when something
+/// that is visible in the image changes (see `MenuBarRenderKey`). Previously
+/// five overlapping publishers each triggered a render, including on every
+/// change of the glucose model, whether or not the label would look different.
 struct MenuBarView: View {
 
     @EnvironmentObject var s: SettingsStore
     @EnvironmentObject var g: Glucose
-    @EnvironmentObject var uc: UpdateChecker
 
     @Environment(\.colorScheme) private var colorScheme
 
-    @State private var menuBarItems: [MenuBarItemContainer] = []
-    @State private var cachedMenuImage: CGImage?
-    @State private var cachedZenImage: CGImage?
-    @State private var lastUpdateTime: Date = Date()
+    @State private var renderedImage: CGImage?
+    @State private var defaultItems: [MenuBarItemContainer] = [
+        MenuBarItemContainer(type: .glucosedot),
+        MenuBarItemContainer(type: .glucosevalue),
+        MenuBarItemContainer(type: .glucosetrend),
+        MenuBarItemContainer(type: .glucosedelta)
+    ]
 
-    private let imageCache = NSCache<NSString, NSImage>()
+    private var menuBarItems: [MenuBarItemContainer] {
+        s.menuBarItems.isEmpty ? defaultItems : s.menuBarItems
+    }
 
-    private func loadMenuBarItems() {
-        if s.menuBarItems.isEmpty {
-            self.menuBarItems = [
-                MenuBarItemContainer(type: .glucosedot),
-                MenuBarItemContainer(type: .glucosevalue),
-                MenuBarItemContainer(type: .glucosetrend),
-                MenuBarItemContainer(type: .glucosedelta)
-            ]
-        } else {
-            self.menuBarItems = s.menuBarItems
+    /// Everything that influences what the rendered label looks like.
+    private var renderKey: MenuBarRenderKey {
+        let extras = g.provider.GlucoseSourceExtras
+        return MenuBarRenderKey(
+            zenMode: s.zenMode,
+            items: s.zenMode ? [] : menuBarItems.map { MenuBarItemSnapshot(type: $0.type, settings: $0.settings) },
+            spacing: s.menuBarItemSpacing,
+            showSourceIcon: s.showSourceIcon,
+            iconSymbol: s.iconSymbol,
+            iconColor: s.iconColor,
+            unit: s.glucoseUnit,
+            highThreshold: s.highThreshold,
+            lowThreshold: s.lowThreshold,
+            glucoseTarget: s.glucoseTarget,
+            cgmProvider: s.cgmProvider,
+            aidEnabled: s.aidEnableIntegration,
+            glucose: g.glucose,
+            delta: g.delta,
+            trend: g.trend,
+            isStale: g.glucoseTime.timeIntervalSinceNow < -360,
+            aid: extras.aid,
+            iob: extras.iob,
+            cob: extras.cob,
+            eventualGlucose: extras.eventualGlucose,
+            loopAge: extras.enactedAt.map { relativeTime(time: $0) },
+            colorScheme: colorScheme
+        )
+    }
+
+    var body: some View {
+        Group {
+            if let renderedImage {
+                Image(renderedImage, scale: 2, label: Text(accessibilityLabel))
+            } else {
+                Image(systemName: "questionmark.circle.dashed")
+            }
+        }
+        .onChange(of: renderKey, initial: true) {
+            renderedImage = render()
         }
     }
 
-    private func generateMenuBarImage() -> CGImage? {
-        let renderer = ImageRenderer(content: AnyView(menuStack))
-        return renderer.cgImage
+    private var accessibilityLabel: String {
+        "\(formatGlucoseForDisplay(settings: s, glucose: g.glucose)) \(s.glucoseUnit.presentable) \(g.trend)"
     }
 
-    private func generateZenModeImage() -> CGImage? {
-        let renderer = ImageRenderer(content: AnyView(zenMode))
+    private func render() -> CGImage? {
+        let content: AnyView = s.zenMode ? AnyView(zenMode) : AnyView(menuStack)
+        let renderer = ImageRenderer(content: content)
         return renderer.cgImage
     }
 
@@ -73,15 +113,14 @@ struct MenuBarView: View {
         }.environment(\.colorScheme, colorScheme == .light ? .light : .dark)
     }
 
-    var menuStack: any View {
-        return HStack(spacing: s.menuBarItemSpacing) {
+    var menuStack: some View {
+        HStack(spacing: s.menuBarItemSpacing) {
             if s.showSourceIcon {
                 Image(systemName: s.iconSymbol)
                     .foregroundStyle(s.iconColor.color)
                     .font(.system(size: 22))
                     .padding(.horizontal, 4)
             }
-            updateNotice()
             ForEach(menuBarItems, id: \.id) { item in
                 // aid integration only works with nightscout, so don't draw it's views for other providers
                 if (s.cgmProvider != .nightscout || !s.aidEnableIntegration) && [.loopstatus, .eventualglucose, .cob, .iob].contains(item.type) {
@@ -99,111 +138,39 @@ struct MenuBarView: View {
         }
     }
 
-    func updateNotice() -> some View {
-        Group {
-            if uc.isOutdated {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 24))
-                    .foregroundStyle(.yellow)
-            }
-        }
-    }
-
-    var zenMode: any View {
+    var zenMode: some View {
         HStack(spacing: s.menuBarItemSpacing) {
-            updateNotice()
             ZenModeView().environmentObject(s).environmentObject(g)
         }
     }
+}
 
-    var body: some View {
-        if s.zenMode {
-            Group {
-                if let cachedZenImage = cachedZenImage {
-                    Image(cachedZenImage, scale: 2, label: Text(""))
-                } else {
-                    Image(systemName: "questionmark.circle.dashed")
-                        .onAppear {
-                            Task {
-                                await MainActor.run {
-                                    self.cachedZenImage = generateZenModeImage()
-                                }
-                            }
-                        }
-                }
-            }
-            .onReceive(g.$glucose.combineLatest(g.$trend)) { _, _ in
-                Task { @MainActor in
-                    self.cachedZenImage = generateZenModeImage()
-                }
-            }            .onReceive(g.provider.objectWillChange) { _ in
-                Task { @MainActor in
-                    let now = Date()
-                    if now.timeIntervalSince(lastUpdateTime) > 1.0 {
-                        lastUpdateTime = now
-                        self.cachedZenImage = generateZenModeImage()
-                    }
-                }
-            }.onReceive(s.$menuBarItemSpacing) { _ in
-                Task { @MainActor in
-                    self.cachedZenImage = generateZenModeImage()
-                }
-            }
-            .onReceive(g.objectWillChange) { _ in
-                Task { @MainActor in
-                    self.cachedZenImage = generateZenModeImage()
-                }
-            }
-        } else {
-            Group {
-                if let cachedMenuImage = cachedMenuImage {
-                    Image(cachedMenuImage, scale: 2, label: Text(""))
-                } else {
-                    Image(systemName: "questionmark.circle.dashed")
-                        .onAppear {
-                            loadMenuBarItems()
-                            Task {
-                                await MainActor.run {
-                                    self.cachedMenuImage = generateMenuBarImage()
-                                }
-                            }
-                        }
-                }
-            }
-            .onReceive(s.$menuBarItems) { _ in
-                Task { @MainActor in
-                    loadMenuBarItems()
-                    self.cachedMenuImage = generateMenuBarImage()
-                }
-            }
-            .onReceive(g.$glucose.combineLatest(g.$delta, g.$trend)) { _, _, _ in
-                Task { @MainActor in
-                    let now = Date()
-                    if now.timeIntervalSince(lastUpdateTime) > 1.0 {
-                        lastUpdateTime = now
-                        self.cachedMenuImage = generateMenuBarImage()
-                    }
-                }
-            }
-            .onReceive(g.provider.objectWillChange) { _ in
-                Task { @MainActor in
-                    let now = Date()
-                    if now.timeIntervalSince(lastUpdateTime) > 1.0 {
-                        lastUpdateTime = now
-                        self.cachedMenuImage = generateMenuBarImage()
-                    }
-                }
-            }
-            .onReceive(s.$menuBarItemSpacing) { _ in
-                Task { @MainActor in
-                    self.cachedMenuImage = generateMenuBarImage()
-                }
-            }
-            .onReceive(g.objectWillChange) { _ in
-                Task { @MainActor in
-                    self.cachedMenuImage = generateMenuBarImage()
-                }
-            }
-        }
-    }
+private struct MenuBarItemSnapshot: Equatable {
+    var type: MenuBarItem
+    var settings: [MenuBarItemSetting]
+}
+
+private struct MenuBarRenderKey: Equatable {
+    var zenMode: Bool
+    var items: [MenuBarItemSnapshot]
+    var spacing: CGFloat
+    var showSourceIcon: Bool
+    var iconSymbol: String
+    var iconColor: CodableColor
+    var unit: GlucoseUnit
+    var highThreshold: Double
+    var lowThreshold: Double
+    var glucoseTarget: Double
+    var cgmProvider: CGMProvider
+    var aidEnabled: Bool
+    var glucose: Double
+    var delta: Double
+    var trend: String
+    var isStale: Bool
+    var aid: GlucoseSourceDevice
+    var iob: Double?
+    var cob: Double?
+    var eventualGlucose: Double?
+    var loopAge: String?
+    var colorScheme: ColorScheme
 }
