@@ -13,7 +13,7 @@ struct DrawGlucose: ChartContent {
     let data: [GraphEntry]
 
     var body: some ChartContent {
-        ForEach(data, id: \.date) { point in
+        ForEach(data) { point in
             if point.forecastType == .none {
                 if point.glucoseType == .meter {
                     PointMark(
@@ -21,7 +21,6 @@ struct DrawGlucose: ChartContent {
                         y: .value("Glucose", point.value)
                     ).lineStyle(StrokeStyle(lineWidth: 2.0))
                         .foregroundStyle(point.color)
-                        .interpolationMethod(.cardinal)
                         .symbolSize(30)
                         .interpolationMethod(.catmullRom)
                         .symbol {
@@ -34,7 +33,6 @@ struct DrawGlucose: ChartContent {
                         y: .value("Glucose", point.value)
                     ).lineStyle(StrokeStyle(lineWidth: 2.0))
                         .foregroundStyle(point.color)
-                        .interpolationMethod(.cardinal)
                         .symbolSize(30)
                         .interpolationMethod(.catmullRom)
                 }

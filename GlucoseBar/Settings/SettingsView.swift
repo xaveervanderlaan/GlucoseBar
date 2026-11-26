@@ -68,7 +68,6 @@ private struct SourcePickerLabel: View {
 
 struct SettingsView: View {
     @EnvironmentObject var sourceManager: SourceManager
-    @EnvironmentObject var uc: UpdateChecker
 
     @State private var selectedItem: SidebarItem? = nil
     @State private var selectedSource: SourceState?
@@ -175,22 +174,6 @@ struct SettingsView: View {
                 .padding(.top, 10)
 
                 Group {
-                    if case .outdated(let latestVersion, let latestBuild) = uc.status {
-                        Button(action: {
-                            NSWorkspace.shared.open(uc.downloadURL)
-                        }) {
-                            Label("Update available: v\(latestVersion)\(uc.channel == .appStore ? "" : " (\(latestBuild))")", systemImage: "arrow.up.circle.fill")
-                                .font(.footnote)
-                                .fontWeight(.medium)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Capsule().fill(.orange))
-                        }
-                        .buttonStyle(.plain)
-                        .padding(.bottom, 8)
-                    }
-
                     Divider()
                         .padding(.horizontal, 20)
                         .padding(.bottom, 6)
@@ -281,7 +264,6 @@ struct SettingsView: View {
                 }
             case .general:
                 GeneralSettingsView()
-                    .environmentObject(uc)
                     .environmentObject(sourceManager)
             case .debug:
                 if let source = sourceManager.sources.first {
@@ -411,5 +393,4 @@ private struct SourceIdentityView: View {
     let sm = SourceManager()
     SettingsView(sourceManager: sm)
         .environmentObject(sm)
-        .environmentObject(UpdateChecker())
 }

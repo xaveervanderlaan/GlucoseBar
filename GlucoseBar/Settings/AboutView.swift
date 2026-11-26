@@ -9,7 +9,6 @@ import SwiftUI
 
 struct AboutView: View {
     @Environment(\.colorScheme) private var colorScheme
-    @EnvironmentObject var uc: UpdateChecker
 
     @ViewBuilder
     var body: some View {

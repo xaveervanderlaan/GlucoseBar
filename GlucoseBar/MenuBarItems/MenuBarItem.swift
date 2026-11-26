@@ -99,7 +99,7 @@ public enum settingValue: String, CaseIterable, Codable, Sendable {
     case none
 }
 
-public struct MenuBarItemSetting: Codable {
+public struct MenuBarItemSetting: Codable, Equatable, Sendable {
     var key: settingKey
     var value: settingValue
 }
@@ -200,12 +200,7 @@ public class MenuBarItemContainer: Equatable, Identifiable, Hashable, Codable, O
     }
 
     func get(_ key: settingKey) -> settingValue {
-        let setting = settings.filter { $0.key == key }.first?.value
-        if setting == nil {
-            return .none
-        }
-
-        return setting ?? .none
+        settings.first(where: { $0.key == key })?.value ?? .none
     }
 
     @MainActor

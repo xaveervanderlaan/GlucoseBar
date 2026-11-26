@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct GraphEntry {
+struct GraphEntry: Identifiable, Equatable, Sendable {
     var date: Date
     var value: Double
     var trend: GlucoseEntry.GlucoseTrend
@@ -16,9 +16,18 @@ struct GraphEntry {
     var color: Color
     var forecastType: ForecastType
     var glucoseType: GlucoseEntry.GlucoseType?
+
+    struct ID: Hashable, Sendable {
+        let forecastType: ForecastType
+        let date: Date
+    }
+
+    /// Unique per series and timestamp. Using `date` alone collided between
+    /// the forecast series (which share timestamps), confusing `ForEach`.
+    var id: ID { ID(forecastType: forecastType, date: date) }
 }
 
-public enum ForecastType: String, CaseIterable, Identifiable {
+public enum ForecastType: String, CaseIterable, Identifiable, Sendable {
     case none
     case zt
     case uam
@@ -60,68 +69,44 @@ public enum ForecastType: String, CaseIterable, Identifiable {
     }
 }
 
-struct ConeData: Identifiable {
-    var id = UUID()
-    var d: Date
-    var v: Double
+/// One time slice of the forecast "cone": the lowest and highest predicted
+/// value across all forecast series at that time.
+struct ConeSlice: Identifiable, Equatable, Sendable {
+    var date: Date
+    var min: Double
+    var max: Double
+    var id: Date { date }
 }
 
-func calculateConeData(entries: [GraphEntry]) -> ([ConeData], [ConeData]) {
-    var minForTime: [Date: Double] = [:]
-    var maxForTime: [Date: Double] = [:]
-
+/// Builds the forecast cone from forecast entries.
+///
+/// Only times covered by every series are included (the span of the shortest
+/// series), and the final slice is dropped, matching the original behaviour.
+func calculateConeData(entries: [GraphEntry], now: Date = Date()) -> [ConeSlice] {
     var counters: [ForecastType: Int] = [:]
-    for entry in entries {
-        if entry.forecastType != .none {
-            if counters.contains(where: {$0.key == entry.forecastType}) {
-                counters[entry.forecastType, default: 0] += 1
-            } else {
-                counters[entry.forecastType] = 1
-            }
+    for entry in entries where entry.forecastType != .none {
+        counters[entry.forecastType, default: 0] += 1
+    }
+
+    let shortestCount = counters.values.min() ?? 0
+    let horizon = now.addingTimeInterval(Double(shortestCount) * 5 * 60)
+
+    var bounds: [Date: (min: Double, max: Double)] = [:]
+    for entry in entries where entry.forecastType != .none && entry.date <= horizon {
+        if let existing = bounds[entry.date] {
+            bounds[entry.date] = (Swift.min(existing.min, entry.value), Swift.max(existing.max, entry.value))
+        } else {
+            bounds[entry.date] = (entry.value, entry.value)
         }
     }
 
-    let shortestType = (counters.min(by: {$0.value < $1.value})?.key) ?? .none
-    let localForecastDuration = Double(counters[shortestType] ?? 0) * 5 * 60
+    var slices = bounds
+        .map { ConeSlice(date: $0.key, min: $0.value.min, max: $0.value.max) }
+        .sorted { $0.date < $1.date }
 
-    for entry in entries {
-        if entry.forecastType != .none && entry.date <= Date(timeIntervalSinceNow: TimeInterval(localForecastDuration)) {
-            if entry.value < minForTime[entry.date] ?? .greatestFiniteMagnitude {
-                minForTime[entry.date] = entry.value
-            }
-            if entry.value > maxForTime[entry.date] ?? -.greatestFiniteMagnitude {
-                maxForTime[entry.date] = entry.value
-            }
-        }
+    if slices.count > 1 {
+        slices.removeLast()
     }
 
-    var minEntries = [ConeData]()
-    for entry in minForTime {
-        minEntries.append(.init(d: entry.key, v: entry.value))
-    }
-
-    var maxEntries = [ConeData]()
-    for entry in maxForTime {
-        maxEntries.append(.init(d: entry.key, v: entry.value))
-    }
-
-    // Sort both arrays by date ascending
-    minEntries.sort { $0.d < $1.d }
-    maxEntries.sort { $0.d < $1.d }
-
-    // Ensure both arrays are the same length
-    if minEntries.count > maxEntries.count {
-        maxEntries.removeLast(minEntries.count - maxEntries.count)
-    } else if maxEntries.count > minEntries.count {
-        minEntries.removeLast(maxEntries.count - minEntries.count)
-    }
-
-    if minEntries.count > 1 {
-        minEntries.removeLast(1)
-    }
-    if maxEntries.count > 1 {
-        maxEntries.removeLast(1)
-    }
-
-    return (minEntries, maxEntries)
+    return slices
 }

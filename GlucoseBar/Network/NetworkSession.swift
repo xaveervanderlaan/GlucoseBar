@@ -32,7 +32,7 @@ extension URLSession {
         let build = Bundle.main.appBuild
         let os = ProcessInfo.processInfo.operatingSystemVersion
         let osString = "\(os.majorVersion).\(os.minorVersion).\(os.patchVersion)"
-        let distributionChannel = DistributionChannel.detect().displayName
+        let distributionChannel = DistributionChannel.current.displayName
         return "GlucoseBar/\(version) (\(build); macOS \(osString); \(distributionChannel); \(installID))"
     }
 

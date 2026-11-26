@@ -17,7 +17,6 @@ struct SourceMenuBarLabel: View {
     @EnvironmentObject var s: SettingsStore
     @EnvironmentObject var g: Glucose
     @EnvironmentObject var vs: ViewState
-    @EnvironmentObject var uc: UpdateChecker
 
     var body: some View {
         Group {
@@ -52,19 +51,15 @@ struct SourceMenuBarLabel: View {
                 MenuBarView()
                     .environmentObject(s)
                     .environmentObject(g)
-                    .environmentObject(uc)
             } else {
                 if !vs.isOnline {
-                    Image(nsImage: NSImage(
-                        systemSymbolName: "bolt.horizontal",
-                        accessibilityDescription: "Can not start GlucoseBar while offline")!)
+                    Image(systemName: "bolt.horizontal")
+                        .accessibilityLabel("Can not start GlucoseBar while offline")
                 } else {
-                    Image(nsImage: NSImage(
-                        systemSymbolName: "drop.halffull",
-                        accessibilityDescription: "Starting GlucoseBar")!)
+                    Image(systemName: "drop.halffull")
+                        .accessibilityLabel("Starting GlucoseBar")
                 }
             }
         }
-        .task { await uc.checkIfNeeded() }
     }
 }

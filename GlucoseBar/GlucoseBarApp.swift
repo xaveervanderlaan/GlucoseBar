@@ -9,7 +9,11 @@ import Network
 import MenuBarExtraAccess
 
 class ViewState: ObservableObject, @unchecked Sendable {
-    @Published var isPanePresented: Bool = false
+    /// Single app-wide connectivity monitor. Previously every `Glucose`
+    /// instance created its own `ViewState` (and with it its own
+    /// `NWPathMonitor` and probe loop), separate from the one the UI observed.
+    static let shared = ViewState()
+
     @Published var isOnline: Bool = false
     private let networkMonitor = NWPathMonitor()
     private let probeQueue = DispatchQueue(label: "tools.t1d.GlucoseBar.probe")
@@ -41,7 +45,7 @@ class ViewState: ObservableObject, @unchecked Sendable {
                 self.startProbe()
             } else {
                 self.cancelProbe()
-                Task { @MainActor in self.isOnline = false }
+                self.setOnline(false)
             }
         }
         networkMonitor.start(queue: DispatchQueue(label: "NetworkMonitor"))
@@ -58,7 +62,7 @@ class ViewState: ObservableObject, @unchecked Sendable {
             guard let self = self else { return }
             if let httpResponse = response as? HTTPURLResponse,
                (200...399).contains(httpResponse.statusCode) {
-                Task { @MainActor in self.isOnline = true }
+                self.setOnline(true)
                 self.retryAttempt = 0
                 self.cancelProbe()
             } else {
@@ -90,6 +94,16 @@ class ViewState: ObservableObject, @unchecked Sendable {
         probeTask?.cancel()
         probeTask = nil
     }
+
+    /// Publishes connectivity changes only when the value actually flips, so
+    /// views observing `ViewState` aren't re-rendered by every probe.
+    private func setOnline(_ online: Bool) {
+        Task { @MainActor in
+            if self.isOnline != online {
+                self.isOnline = online
+            }
+        }
+    }
 }
 
 @main
@@ -97,8 +111,7 @@ struct GlucoseBarApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     @StateObject var sourceManager: SourceManager = SourceManager()
-    @StateObject var vs: ViewState = ViewState()
-    @StateObject var uc: UpdateChecker = UpdateChecker()
+    @StateObject var vs: ViewState = .shared
     @StateObject var coordinator: MenuBarCoordinator = MenuBarCoordinator()
     private let preferencesController = PreferencesController()
 
@@ -107,6 +120,9 @@ struct GlucoseBarApp: App {
 
     init() {
         _ = KeepAliveManager.shared
+        // Capture the language in effect at launch, so Settings can tell when
+        // a restart is needed for a newly chosen language.
+        _ = AppLanguage.atLaunch
     }
 
     // MARK: - Scene body
@@ -181,7 +197,6 @@ struct GlucoseBarApp: App {
                     NSApp.deactivate()
                 }
                 .environmentObject(sourceManager)
-                .environmentObject(uc)
         }
         .handlesExternalEvents(matching: Set(arrayLiteral: "SettingsView"))
     }
@@ -194,7 +209,6 @@ struct GlucoseBarApp: App {
             .environmentObject(source.glucose)
             .environmentObject(source.settings)
             .environmentObject(vs)
-            .environmentObject(uc)
             .environmentObject(sourceManager)
             .onAppear   { Task { @MainActor in source.isPanePresented = true  } }
             .onDisappear { Task { @MainActor in source.isPanePresented = false } }
@@ -206,7 +220,6 @@ struct GlucoseBarApp: App {
             .environmentObject(source.glucose)
             .environmentObject(source.settings)
             .environmentObject(vs)
-            .environmentObject(uc)
     }
 
     // MARK: - isInserted binding helpers

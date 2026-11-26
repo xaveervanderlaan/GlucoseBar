@@ -34,7 +34,7 @@ struct ProviderAuth: Decodable {
     var expiry: Double
 }
 
-struct GlucoseSourceExtraProperties {
+struct GlucoseSourceExtraProperties: Equatable {
     var aid: GlucoseSourceDevice = .null
     var iob: Double? = nil
     var cob: Double? = nil
@@ -46,7 +46,7 @@ struct GlucoseSourceExtraProperties {
     var error: String? = nil
 }
 
-struct AIDForecasts: Decodable {
+struct AIDForecasts: Decodable, Equatable {
     var iob: [Int]?
     var cob: [Int]?
     var zt: [Int]?
@@ -112,6 +112,34 @@ class Provider: ObservableObject, @unchecked Sendable {
         _glucoseEntries
     }
 
+    /// Maximum number of readings kept in memory (24h of 5-minute readings).
+    static let maxStoredEntries = 288
+
+    /// Merges freshly fetched readings into the existing list.
+    ///
+    /// Readings are de-duplicated (by identifier when available, otherwise by
+    /// timestamp), sorted newest-first and capped at `limit`. Without this the
+    /// list kept growing with duplicates whenever a provider re-sent readings it
+    /// had already delivered, which made the chart progressively slower.
+    static func mergeEntries(_ newEntries: [GlucoseEntry], into existing: [GlucoseEntry], limit: Int = Provider.maxStoredEntries) -> [GlucoseEntry] {
+        var seen = Set<String>()
+        seen.reserveCapacity(newEntries.count + existing.count)
+        var merged: [GlucoseEntry] = []
+        merged.reserveCapacity(newEntries.count + existing.count)
+        // New entries win over existing ones with the same key.
+        for entry in newEntries + existing {
+            let key = entry.id ?? "date:\(entry.date.timeIntervalSince1970)"
+            if seen.insert(key).inserted {
+                merged.append(entry)
+            }
+        }
+        merged.sort { $0.date > $1.date }
+        if merged.count > limit {
+            merged.removeLast(merged.count - limit)
+        }
+        return merged
+    }
+
     func setGlucoseEntries(_ entries: [GlucoseEntry]) {
         _glucoseEntries = entries
     }
@@ -127,6 +155,11 @@ class Provider: ObservableObject, @unchecked Sendable {
     func verifyCredentials() async -> Bool {
         return true
     }
+
+    /// Releases long-lived resources (sockets, timers) held by the provider.
+    /// Called when the provider is replaced or its source is removed, so that
+    /// discarded providers don't keep polling in the background.
+    func teardown() {}
 
     func getCurrent() -> GlucoseEntry {
         let entries = getSafeGlucoseEntries()

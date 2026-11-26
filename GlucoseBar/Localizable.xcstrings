@@ -94,7 +94,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " (Als je deze fout een paar keer achter elkaar hebt geplaatst, Dit kan ook betekenen dat de Dexcom servers u een korte time-out hebben gegeven voordat u weer kunt inloggen)"
+            "value" : " (Als je deze fout een paar keer achter elkaar krijgt, kan dit ook betekenen dat de Dexcom-servers je tijdelijk hebben geblokkeerd voordat je opnieuw kunt inloggen)"
           }
         },
         "pl" : {
@@ -234,7 +234,7 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "- Prøv at slå Dexcom Del fra i Dexcom G6 eller G7 appen, luk appen, og derefter aktivere det igen."
+            "value" : "- Prøv at slå Dexcom Share fra i Dexcom G6 eller G7 appen, luk appen, og derefter aktivere det igen."
           }
         },
         "es" : {
@@ -258,13 +258,13 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "- Probeer Dexcom Share uit te zetten in de Dexcom G6 of G7 app, de app gedwongen te sluiten en vervolgens opnieuw in te schakelen."
+            "value" : "- Zet Dexcom Share uit in de Dexcom G6- of G7-app, forceer de app om te stoppen en zet het daarna weer aan."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "- Spróbuj wyłączyć udział Dexcom w aplikacji Dexcom G6 lub G7, wymuś zamknięcie aplikacji, a następnie włączyć ją ponownie."
+            "value" : "- Spróbuj wyłączyć Dexcom Share w aplikacji Dexcom G6 lub G7, wymuś zamknięcie aplikacji, a następnie włączyć ją ponownie."
           }
         },
         "ro" : {
@@ -276,7 +276,7 @@
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "- Försök att stänga av Dexcom Dela av i Dexcom G6 eller G7-appen, tvinga appen att stänga och aktivera den igen."
+            "value" : "- Försök att stänga av Dexcom Share i Dexcom G6 eller G7-appen, tvinga appen att stänga och aktivera den igen."
           }
         }
       }
@@ -311,7 +311,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "- Controleer of uw Dexcom app niet is uitgelogd of niet is geüpload naar Dexcom."
+            "value" : "- Controleer of je Dexcom-app niet is uitgelogd en wel gegevens naar Dexcom uploadt."
           }
         },
         "pl" : {
@@ -363,7 +363,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "- U bent aangemeld bij GlucoseBar met dezelfde gebruiker als in uw primaire Dexcom app."
+            "value" : "- Je bent in GlucoseBar ingelogd met dezelfde gebruiker als in je primaire Dexcom-app."
           }
         },
         "pl" : {
@@ -415,7 +415,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "- U heeft Dexcom Share ingeschakeld en heeft ten minste één volger."
+            "value" : "- Je hebt Dexcom Share ingeschakeld en hebt ten minste één volger."
           }
         },
         "pl" : {
@@ -427,7 +427,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "- Ați activat Partajarea Dexcom și aveți cel puțin un urmăritor."
+            "value" : "- Ați activat Dexcom Share și aveți cel puțin un urmăritor."
           }
         },
         "sv" : {
@@ -1051,7 +1051,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "< 1 min. ago"
+            "value" : "< 1 min. geleden"
           }
         },
         "pl" : {
@@ -1683,7 +1683,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Informatie"
+            "value" : "Over"
           }
         },
         "pl" : {
@@ -1741,7 +1741,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erkenningen"
+            "value" : "Dankbetuigingen"
           }
         },
         "pl" : {
@@ -1909,7 +1909,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Na COB waarde"
+            "value" : "Na COB-waarde"
           }
         },
         "pl" : {
@@ -1967,7 +1967,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Na uiteindelijke waarde"
+            "value" : "Na uiteindelijke glucosewaarde"
           }
         },
         "pl" : {
@@ -2025,7 +2025,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Na Glucose Waarde"
+            "value" : "Na glucosewaarde"
           }
         },
         "pl" : {
@@ -2083,7 +2083,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Na IOB waarde"
+            "value" : "Na IOB-waarde"
           }
         },
         "pl" : {
@@ -2142,7 +2142,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Na tijd sinds Herhaal"
+            "value" : "Na tijd sinds laatste loop"
           }
         },
         "pl" : {
@@ -2201,7 +2201,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AID integratie"
+            "value" : "AID-integratie"
           }
         },
         "pl" : {
@@ -2260,7 +2260,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AID staat voor Automated Insulin Delivery systeem. Dergelijke systemen kunnen extra informatie bieden, zoals Loop Status, IOB, COB, Eventual Glucose, voorspellingslijnen en meer."
+            "value" : "AID staat voor Automated Insulin Delivery (geautomatiseerde insulinetoediening). Zulke systemen kunnen extra informatie geven, zoals de loopstatus, IOB, COB, uiteindelijke glucose, voorspellingslijnen en meer."
           }
         },
         "pl" : {
@@ -2313,7 +2313,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AID systeem: %@"
+            "value" : "AID-systeem: %@"
           }
         },
         "pl" : {
@@ -2366,7 +2366,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alle log-instructies worden naar een bestand geschreven in Applicatie ondersteuning."
+            "value" : "Alle logregels worden naar een bestand in Application Support geschreven."
           }
         },
         "pl" : {
@@ -2477,7 +2477,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weet u zeker dat u de gegevens van %@ wilt verwijderen?"
+            "value" : "Weet je zeker dat je de gegevens van %@ wilt verwijderen?"
           }
         },
         "pl" : {
@@ -2583,7 +2583,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GlucoseBar automatisch starten wanneer u inlogt op uw Mac"
+            "value" : "GlucoseBar automatisch openen wanneer je inlogt op je Mac"
           }
         },
         "pl" : {
@@ -2641,7 +2641,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voor COB waarde"
+            "value" : "Voor COB-waarde"
           }
         },
         "pl" : {
@@ -2699,7 +2699,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voor Eventual Glucose waarde"
+            "value" : "Voor uiteindelijke glucosewaarde"
           }
         },
         "pl" : {
@@ -2757,7 +2757,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voor Glucose Waarde"
+            "value" : "Voor glucosewaarde"
           }
         },
         "pl" : {
@@ -2815,7 +2815,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voor IOB waarde"
+            "value" : "Voor IOB-waarde"
           }
         },
         "pl" : {
@@ -2874,7 +2874,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voor de tijd sinds Loop"
+            "value" : "Voor tijd sinds laatste loop"
           }
         },
         "pl" : {
@@ -2932,7 +2932,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bold"
+            "value" : "Vet"
           }
         },
         "pl" : {
@@ -2990,7 +2990,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "annuleren"
+            "value" : "Annuleer"
           }
         },
         "pl" : {
@@ -3048,7 +3048,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Koolhydraten oranje kleur"
+            "value" : "Oranje koolhydraatkleur"
           }
         },
         "pl" : {
@@ -3283,7 +3283,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grafiek gegevens"
+            "value" : "Grafiekgegevens"
           }
         },
         "pl" : {
@@ -3342,7 +3342,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grafiek opties"
+            "value" : "Grafiekopties"
           }
         },
         "pl" : {
@@ -3401,7 +3401,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kaartweergave opties"
+            "value" : "Weergaveopties grafiek"
           }
         },
         "pl" : {
@@ -3459,7 +3459,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Controleer de instellingen en zorg ervoor dat uw CGM-bron (%@) reageert."
+            "value" : "Controleer de instellingen en zorg dat je CGM-bron (%@) reageert."
           }
         },
         "pl" : {
@@ -3576,19 +3576,19 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bot"
+            "value" : "Kegel"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klatka"
+            "value" : "Stożek"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Conu"
+            "value" : "Con"
           }
         },
         "sv" : {
@@ -4015,7 +4015,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Logboekregistratie voor foutopsporing"
+            "value" : "Debuglogboek"
           }
         },
         "pl" : {
@@ -4068,7 +4068,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Debug modus ingeschakeld"
+            "value" : "Debugmodus ingeschakeld"
           }
         },
         "pl" : {
@@ -4121,7 +4121,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Debug modus logt extra informatie voor probleemoplossing."
+            "value" : "In debugmodus wordt extra informatie gelogd om problemen op te sporen."
           }
         },
         "pl" : {
@@ -4237,7 +4237,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Standaard kleur"
+            "value" : "Standaardkleur"
           }
         },
         "pl" : {
@@ -4469,7 +4469,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dexcom Regio"
+            "value" : "Dexcom-regio"
           }
         },
         "pl" : {
@@ -4510,7 +4510,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Compartir Dexcom"
+            "value" : "Dexcom Share"
           }
         },
         "fr" : {
@@ -4522,31 +4522,31 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Condivisione Dexcom"
+            "value" : "Dexcom Share"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dexcom Delen"
+            "value" : "Dexcom Share"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Udział Dexcom"
+            "value" : "Dexcom Share"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Partajare Dexcom"
+            "value" : "Dexcom Share"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dela Dexcom"
+            "value" : "Dexcom Share"
           }
         }
       }
@@ -4568,7 +4568,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Error de compartir Dexcom: "
+            "value" : "Error de Dexcom Share: "
           }
         },
         "fr" : {
@@ -4580,31 +4580,31 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Errore Di Condivisione Dexcom: "
+            "value" : "Errore di Dexcom Share: "
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dexcom Share fout: "
+            "value" : "Dexcom Share-fout: "
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Błąd udostępniania Dexcom: "
+            "value" : "Błąd Dexcom Share: "
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eroare de partajare Dexcom: "
+            "value" : "Eroare Dexcom Share: "
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fel vid Dexcom delning: "
+            "value" : "Dexcom Share-fel: "
           }
         }
       }
@@ -4697,7 +4697,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weergeven"
+            "value" : "Weergave"
           }
         },
         "pl" : {
@@ -4814,7 +4814,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dynamische Glucose Kleur"
+            "value" : "Dynamische glucosekleur"
           }
         },
         "pl" : {
@@ -4984,7 +4984,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AID integratie inschakelen"
+            "value" : "AID-integratie inschakelen"
           }
         },
         "pl" : {
@@ -5037,7 +5037,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Debug modus inschakelen?"
+            "value" : "Debugmodus inschakelen?"
           }
         },
         "pl" : {
@@ -5095,7 +5095,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Foutmelding"
+            "value" : "Fout"
           }
         },
         "pl" : {
@@ -5154,7 +5154,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eventuele glucose"
+            "value" : "Uiteindelijke glucose"
           }
         },
         "pl" : {
@@ -5212,7 +5212,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lettertype Gewicht"
+            "value" : "Letterdikte"
           }
         },
         "pl" : {
@@ -5270,7 +5270,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prognose soort"
+            "value" : "Soort voorspelling"
           }
         },
         "pl" : {
@@ -5328,7 +5328,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Weersverwachting Series"
+            "value" : "Voorspellingsreeks"
           }
         },
         "pl" : {
@@ -5789,7 +5789,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Glucose grafiek kleurenschema"
+            "value" : "Kleurenschema glucosegrafiek"
           }
         },
         "pl" : {
@@ -5907,7 +5907,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Glucose punt"
+            "value" : "Glucosestip"
           }
         },
         "pl" : {
@@ -5965,7 +5965,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Glucose opties"
+            "value" : "Glucose-opties"
           }
         },
         "pl" : {
@@ -6082,7 +6082,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Glucose Unit"
+            "value" : "Glucose-eenheid"
           }
         },
         "pl" : {
@@ -6141,7 +6141,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Glucose Waarde"
+            "value" : "Glucosewaarde"
           }
         },
         "pl" : {
@@ -6182,7 +6182,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Barra de glucosa"
+            "value" : "GlucoseBar"
           }
         },
         "fr" : {
@@ -6206,19 +6206,19 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pasek Glukozy"
+            "value" : "GlucoseBar"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bară"
+            "value" : "GlucoseBar"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GlukoseBar"
+            "value" : "GlucoseBar"
           }
         }
       }
@@ -6258,7 +6258,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hi,\nI'm GlucoseBar."
+            "value" : "Hoi,\nik ben GlucoseBar."
           }
         },
         "pl" : {
@@ -6316,7 +6316,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hidden"
+            "value" : "Verborgen"
           }
         },
         "pl" : {
@@ -6432,7 +6432,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "hoog"
+            "value" : "Hoog"
           }
         },
         "pl" : {
@@ -6490,7 +6490,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hoge grenswaarde"
+            "value" : "Hoge drempel"
           }
         },
         "pl" : {
@@ -6548,7 +6548,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ik ben een eerste privacytoepassing die hier in de menubalk op uw Mac staat, zorg voor een snelle blik op je Continous Glucose Monitor (CGM)-uitlezingen, vanuit plaatsen als Nightscout en Dexcom"
+            "value" : "Ik ben een app die privacy voorop stelt. Vanuit de menubalk van je Mac laat ik je in één oogopslag je CGM-waarden (continue glucosemonitor) zien, van bronnen als Nightscout en Dexcom"
           }
         },
         "pl" : {
@@ -6659,7 +6659,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pictogram kleur"
+            "value" : "Pictogramkleur"
           }
         },
         "pl" : {
@@ -6717,7 +6717,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pictogram locatie"
+            "value" : "Pictogrampositie"
           }
         },
         "pl" : {
@@ -6823,7 +6823,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Als je nog steeds problemen hebt, post dan een gedetailleerd probleem op GitHub."
+            "value" : "Heb je nog steeds problemen? Meld het dan zo gedetailleerd mogelijk op GitHub."
           }
         },
         "pl" : {
@@ -6881,7 +6881,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Insuline Blauwe Kleur"
+            "value" : "Blauwe insulinekleur"
           }
         },
         "pl" : {
@@ -7069,7 +7069,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Răspuns nevalid din Partajarea Dexcom"
+            "value" : "Răspuns nevalid din Dexcom Share"
           }
         },
         "sv" : {
@@ -7110,7 +7110,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Item Spatiëring"
+            "value" : "Ruimte tussen items"
           }
         },
         "pl" : {
@@ -7168,7 +7168,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Start bij inloggen"
+            "value" : "Open bij inloggen"
           }
         },
         "pl" : {
@@ -7226,7 +7226,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gedrag starten"
+            "value" : "Opstartgedrag"
           }
         },
         "pl" : {
@@ -7343,7 +7343,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Regels"
+            "value" : "Lijnen"
           }
         },
         "pl" : {
@@ -7507,7 +7507,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Logboekbestanden worden opgeslagen in ~/Library/Applicatie ondersteuning/tools.t1d.GlucoseBal/logs/. Elke sessie maakt een nieuwe debug.log; de vorige sessie is hernoemd met een tijdstempel."
+            "value" : "Logbestanden worden opgeslagen in ~/Library/Application Support/tools.t1d.GlucoseBar/logs/. Elke sessie maakt een nieuw debug.log aan; het log van de vorige sessie krijgt een tijdstempel in de naam."
           }
         },
         "pl" : {
@@ -7542,37 +7542,37 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Información del pronóstico del bucle"
+            "value" : "Información del pronóstico de Loop"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Informations de prévision de boucle"
+            "value" : "Informations de prévision de Loop"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Informazioni sulle previsioni del ciclo"
+            "value" : "Informazioni sulle previsioni di Loop"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voorspelling herhalen"
+            "value" : "Loop-voorspelling"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Informacje prognozy pętli"
+            "value" : "Informacje prognozy Loop"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Informații prognoză buclă"
+            "value" : "Informații prognoză Loop"
           }
         },
         "sv" : {
@@ -7618,7 +7618,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Icoon en tijd sinds lus herhalen"
+            "value" : "Loop-pictogram en tijd sinds laatste loop"
           }
         },
         "pl" : {
@@ -7676,7 +7676,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Alleen pictogram herhalen"
+            "value" : "Alleen loop-pictogram"
           }
         },
         "pl" : {
@@ -7735,7 +7735,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Status herhalen"
+            "value" : "Loopstatus"
           }
         },
         "pl" : {
@@ -7793,7 +7793,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Status en tijd sinds laatste lus"
+            "value" : "Loopstatus en tijd sinds laatste loop"
           }
         },
         "pl" : {
@@ -7851,7 +7851,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "laag"
+            "value" : "Laag"
           }
         },
         "pl" : {
@@ -7909,7 +7909,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lage grenswaarde"
+            "value" : "Lage drempel"
           }
         },
         "pl" : {
@@ -7967,7 +7967,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Max Waarde"
+            "value" : "Max. waarde"
           }
         },
         "pl" : {
@@ -8025,7 +8025,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Menu Balk"
+            "value" : "Menubalk"
           }
         },
         "pl" : {
@@ -8083,7 +8083,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Menubalk instellingen"
+            "value" : "Menubalkinstellingen"
           }
         },
         "pl" : {
@@ -8306,7 +8306,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "naam"
+            "value" : "Naam"
           }
         },
         "pl" : {
@@ -8359,7 +8359,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Smalle"
+            "value" : "Smal"
           }
         },
         "pl" : {
@@ -8400,7 +8400,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Explorador nocturno"
+            "value" : "Nightscout"
           }
         },
         "fr" : {
@@ -8418,7 +8418,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nachtscout"
+            "value" : "Nightscout"
           }
         },
         "pl" : {
@@ -8476,7 +8476,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neen"
+            "value" : "Nee"
           }
         },
         "pl" : {
@@ -8505,7 +8505,7 @@
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ingen data fra Dexcom. Kontroller, at din Dexcom Del-forbindelse er funktionel på din telefon."
+            "value" : "Ingen data fra Dexcom. Kontroller, at din Dexcom Share-forbindelse er funktionel på din telefon."
           }
         },
         "es" : {
@@ -8529,7 +8529,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Geen gegevens van Dexcom. Zorg ervoor dat uw Dexcom Share verbinding werkt op uw telefoon."
+            "value" : "Geen gegevens van Dexcom. Controleer of de Dexcom Share-verbinding op je telefoon werkt."
           }
         },
         "pl" : {
@@ -8646,7 +8646,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Geen aanbieder"
+            "value" : "Geen bron"
           }
         },
         "pl" : {
@@ -8704,7 +8704,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zie je je keuze AID hier niet? Open een issue op GitHub en laat zien of we het implementeren."
+            "value" : "Staat jouw AID er niet tussen? Open een issue op GitHub, dan kijken we of we het kunnen toevoegen."
           }
         },
         "pl" : {
@@ -8815,7 +8815,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zodra je eerste bron is ingesteld, kun je meer bronnen uit de Bronnen sectie toevoegen in Instellingen."
+            "value" : "Zodra je eerste bron is ingesteld, kun je via Profielen in Instellingen meer bronnen toevoegen."
           }
         },
         "pl" : {
@@ -8868,7 +8868,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GitHub probleem openen"
+            "value" : "Open GitHub-issue"
           }
         },
         "pl" : {
@@ -8926,7 +8926,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "GitHub problemen openen"
+            "value" : "Open GitHub-issues"
           }
         },
         "pl" : {
@@ -8985,7 +8985,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Buiten USA"
+            "value" : "Buiten de VS"
           }
         },
         "pl" : {
@@ -9101,7 +9101,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wachtwoord kan niet leeg zijn"
+            "value" : "Wachtwoord mag niet leeg zijn"
           }
         },
         "pl" : {
@@ -9154,7 +9154,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zorg voor het volgende:"
+            "value" : "Controleer het volgende:"
           }
         },
         "pl" : {
@@ -9207,7 +9207,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open een ticket op GitHub met zo veel mogelijk details over je apparaat en het AID systeem dat je gebruikt"
+            "value" : "Open een ticket op GitHub met zo veel mogelijk details over je apparaat en het AID-systeem dat je gebruikt"
           }
         },
         "pl" : {
@@ -9312,7 +9312,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Profiel identiteit"
+            "value" : "Profielidentiteit"
           }
         },
         "pl" : {
@@ -9417,7 +9417,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Profiles"
+            "value" : "Profielen"
           }
         },
         "pl" : {
@@ -9475,7 +9475,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Leverancier"
+            "value" : "Bron"
           }
         },
         "pl" : {
@@ -9533,7 +9533,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Provider-probleem: %@"
+            "value" : "Probleem met bron: %@"
           }
         },
         "pl" : {
@@ -9591,7 +9591,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Afsluiten"
+            "value" : "Stop"
           }
         },
         "pl" : {
@@ -9760,7 +9760,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwijder \"%@\"?"
+            "value" : "\"%@\" verwijderen?"
           }
         },
         "pl" : {
@@ -9818,7 +9818,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwijder %@"
+            "value" : "%@ verwijderen"
           }
         },
         "pl" : {
@@ -9924,7 +9924,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwijdert alle opgeslagen instellingen en keert de app terug naar zijn oorspronkelijke staat, terwijl Debug Mode ingeschakeld blijft."
+            "value" : "Verwijdert alle opgeslagen instellingen en zet de app terug naar de begintoestand. Debugmodus blijft ingeschakeld."
           }
         },
         "pl" : {
@@ -9977,7 +9977,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verwijdert het debug menu uit het instellingenpaneel en stopt met het naar schijf schrijven van logs voor elke sessie. Aanbevolen als u geen ontwikkelaar bent of een ontwikkelaar helpt een probleem te begrijpen."
+            "value" : "Verwijdert het debugmenu uit de instellingen en stopt met het per sessie wegschrijven van logs. Aanbevolen als je geen ontwikkelaar bent en ook geen ontwikkelaar helpt een probleem te onderzoeken."
           }
         },
         "pl" : {
@@ -10093,7 +10093,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verzoek timed out"
+            "value" : "Time-out bij verzoek"
           }
         },
         "pl" : {
@@ -10146,7 +10146,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reset alle gegevens"
+            "value" : "Alle gegevens wissen"
           }
         },
         "pl" : {
@@ -10199,7 +10199,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reset Gegevens"
+            "value" : "Gegevens wissen"
           }
         },
         "pl" : {
@@ -10252,7 +10252,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Onthullen in de Finder"
+            "value" : "Toon in Finder"
           }
         },
         "pl" : {
@@ -10368,7 +10368,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Selecteer een aanbieder"
+            "value" : "Kies een bron"
           }
         },
         "pl" : {
@@ -10426,7 +10426,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Selecteer CGM"
+            "value" : "Kies CGM"
           }
         },
         "pl" : {
@@ -10543,7 +10543,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Scheidingsteken Kleur"
+            "value" : "Kleur scheidingsteken"
           }
         },
         "pl" : {
@@ -10717,7 +10717,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Koolhydraten aan boord tonen"
+            "value" : "Toon koolhydraten aan boord"
           }
         },
         "pl" : {
@@ -10775,7 +10775,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eventuele glucose weergeven"
+            "value" : "Toon uiteindelijke glucose"
           }
         },
         "pl" : {
@@ -10833,7 +10833,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toon Voorspelling"
+            "value" : "Toon voorspelling"
           }
         },
         "pl" : {
@@ -10892,7 +10892,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toon High Threshold lijn"
+            "value" : "Toon lijn hoge drempel"
           }
         },
         "pl" : {
@@ -11061,7 +11061,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toon Loop Status"
+            "value" : "Toon loopstatus"
           }
         },
         "pl" : {
@@ -11120,7 +11120,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toon Lage Drempel Lijn"
+            "value" : "Toon lijn lage drempel"
           }
         },
         "pl" : {
@@ -11296,7 +11296,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aangezien dit de eerste keer is dat we elkaar ontmoeten, moet u mij helpen om toegang te krijgen tot uw glucosegegevens. Ga naar %@ Instellingen om aan de slag te gaan."
+            "value" : "Omdat we elkaar voor het eerst ontmoeten, heb ik je hulp nodig om bij je glucosegegevens te komen. Ga naar %@ Instellingen om te beginnen."
           }
         },
         "pl" : {
@@ -11354,7 +11354,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enkelvoudige kleur"
+            "value" : "Eén kleur"
           }
         },
         "pl" : {
@@ -11459,7 +11459,7 @@
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stationnaire"
+            "value" : "Statique"
           }
         },
         "it" : {
@@ -11471,7 +11471,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "statisch"
+            "value" : "Statisch"
           }
         },
         "pl" : {
@@ -11529,7 +11529,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Statische Glucose Kleur"
+            "value" : "Statische glucosekleur"
           }
         },
         "pl" : {
@@ -11582,13 +11582,13 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ondersteunde aids zijn AAPS, Loop, OpenAPS en Trio."
+            "value" : "Ondersteunde AID-systemen zijn AAPS, Loop, OpenAPS en Trio."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wspierane AIDs to AAPS, pętle, OpenAPS i Trio."
+            "value" : "Wspierane systemy AID to AAPS, Loop, OpenAPS i Trio."
           }
         },
         "ro" : {
@@ -11642,7 +11642,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ondersteunde aids zijn Trio, OpenAPS, AAPS."
+            "value" : "Ondersteunde AID-systemen zijn Trio, OpenAPS en AAPS."
           }
         },
         "pl" : {
@@ -11758,7 +11758,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Target"
+            "value" : "Doel"
           }
         },
         "pl" : {
@@ -11874,7 +11874,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tekst kleur"
+            "value" : "Tekstkleur"
           }
         },
         "pl" : {
@@ -11932,7 +11932,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "De glucose stit heeft geen instellingen"
+            "value" : "De glucosestip heeft geen instellingen"
           }
         },
         "pl" : {
@@ -11990,7 +11990,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "De simulator heeft geen instellingen en is een CGM provider geïmplementeerd om de app te testen zonder verbinding te maken met een echte CGM provider zoals Dexcom of Nightscout."
+            "value" : "De simulator heeft geen instellingen. Het is een CGM-bron waarmee je de app kunt testen zonder een echte CGM-bron zoals Dexcom of Nightscout te koppelen."
           }
         },
         "pl" : {
@@ -12048,7 +12048,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Het doel wordt gebruikt om de glucose waarden in de grafiek correct te kleuren wanneer het is ingesteld op gebruik van dynamische kleuren."
+            "value" : "Het doel wordt gebruikt om glucosewaarden in de grafiek de juiste kleur te geven als je dynamische kleuren gebruikt."
           }
         },
         "pl" : {
@@ -12106,7 +12106,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "De token is vereist om GlucoseBar goed te laten functioneren. Zorg ervoor dat je Nightscout instantie ingesteld is en deze hier gebruikt."
+            "value" : "Het token is nodig om GlucoseBar goed te laten werken. Zorg dat er in je Nightscout-installatie een token is aangemaakt en vul het hier in."
           }
         },
         "pl" : {
@@ -12222,7 +12222,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deze referenties zijn de gegevens van uw primaire Dexcom account. U moet ten minste één volger in de Dexcom app hebben."
+            "value" : "Dit zijn de inloggegevens van je primaire Dexcom-account. Je moet in de Dexcom-app ook ten minste één volger hebben."
           }
         },
         "pl" : {
@@ -12281,7 +12281,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dit zijn de gegevens die u in en rond de grafiek ziet wanneer u GlucoseBar opent"
+            "value" : "Dit zijn de gegevens die je in en rond de grafiek ziet wanneer je GlucoseBar opent"
           }
         },
         "pl" : {
@@ -12339,7 +12339,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deze token moet de permissie \"leesbaar\" hebben in Nightscout."
+            "value" : "Dit token moet in Nightscout de rechten \"readable\" hebben."
           }
         },
         "pl" : {
@@ -12392,7 +12392,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dit zal alle instellingen verwijderen en de applicatie opnieuw starten. Dit kan niet ongedaan worden gemaakt."
+            "value" : "Hiermee worden alle instellingen gewist en wordt de app opnieuw gestart. Dit kan niet ongedaan worden gemaakt."
           }
         },
         "pl" : {
@@ -12445,7 +12445,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dit zal debug-modus uitschakelen die GlucoseBar schrijflogbestanden naar je computer zal stoppen en het Debug menu uit het instellingenpaneel zal verwijderen."
+            "value" : "Hiermee schakel je de debugmodus uit: GlucoseBar schrijft dan geen logbestanden meer naar je computer en het debugmenu verdwijnt uit de instellingen."
           }
         },
         "pl" : {
@@ -12561,7 +12561,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tijd sinds alleen herhalen"
+            "value" : "Alleen tijd sinds laatste loop"
           }
         },
         "pl" : {
@@ -12677,7 +12677,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Vertalen"
+            "value" : "Vertalingen"
           }
         },
         "pl" : {
@@ -12806,7 +12806,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imposibil de decodat ID-ul contului din Partajarea Dexcom"
+            "value" : "Imposibil de decodat ID-ul contului din Dexcom Share"
           }
         },
         "sv" : {
@@ -12865,7 +12865,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imposibil de decodat ID-ul sesiunii din Partajarea Dexcom"
+            "value" : "Imposibil de decodat ID-ul sesiunii din Dexcom Share"
           }
         },
         "sv" : {
@@ -12905,31 +12905,31 @@
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossibile ottenere i dati del trio: richiesta scaduta"
+            "value" : "Impossibile ottenere i dati di Trio: richiesta scaduta"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kan Trio gegevens niet ophalen: verzoek time-out"
+            "value" : "Kan Trio-gegevens niet ophalen: time-out bij verzoek"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie można uzyskać danych trio: limit czasu żądania"
+            "value" : "Nie można uzyskać danych Trio: limit czasu żądania"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imposibil de obținut datele trio: Solicitarea a expirat"
+            "value" : "Imposibil de obținut datele Trio: Solicitarea a expirat"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Det går inte att hämta trio-data: Begäran har gått ut"
+            "value" : "Det går inte att hämta Trio-data: Begäran har gått ut"
           }
         }
       }
@@ -12951,13 +12951,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pueden leer datos de Dexcom Compartir: Datos corruptos."
+            "value" : "No se pueden leer datos de Dexcom Share: Datos corruptos."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de lire les données du partage Dexcom : Données corrompues."
+            "value" : "Impossible de lire les données de Dexcom Share : Données corrompues."
           }
         },
         "it" : {
@@ -12969,7 +12969,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kan geen gegevens lezen van Dexcom Share: gegevens beschadigd."
+            "value" : "Kan gegevens van Dexcom Share niet lezen: gegevens beschadigd."
           }
         },
         "pl" : {
@@ -12981,13 +12981,13 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imposibil de citit datele din Dexcom: Datele sunt corupte."
+            "value" : "Imposibil de citit datele din Dexcom Share: Datele sunt corupte."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Det går inte att läsa data från Dexcom Dela: Data skadat."
+            "value" : "Det går inte att läsa data från Dexcom Share: Data skadat."
           }
         }
       }
@@ -13009,25 +13009,25 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pueden leer los datos de Dexcom Compartir: falta la clave "
+            "value" : "No se pueden leer los datos de Dexcom Share: falta la clave "
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de lire les données à partir du partage Dexcom : Clé manquante "
+            "value" : "Impossible de lire les données de Dexcom Share : Clé manquante "
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossibile leggere i dati da Dexcom Condividi: Chiave mancante "
+            "value" : "Impossibile leggere i dati da Dexcom Share: Chiave mancante "
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kan de gegevens van Dexcom Share: Ontbrekende sleutel niet lezen "
+            "value" : "Kan gegevens van Dexcom Share niet lezen: ontbrekende sleutel "
           }
         },
         "pl" : {
@@ -13039,7 +13039,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imposibil de citit datele din Dexcom: Cheie lipsă "
+            "value" : "Imposibil de citit datele din Dexcom Share: Cheie lipsă "
           }
         },
         "sv" : {
@@ -13067,25 +13067,25 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pueden leer los datos de Dexcom Compartir: falta el valor requerido"
+            "value" : "No se pueden leer los datos de Dexcom Share: falta el valor requerido"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de lire les données à partir du partage Dexcom : Valeur requise manquante"
+            "value" : "Impossible de lire les données de Dexcom Share : Valeur requise manquante"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossibile leggere i dati da Dexcom Condividi: Valore richiesto mancante"
+            "value" : "Impossibile leggere i dati da Dexcom Share: Valore richiesto mancante"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kan de gegevens van Dexcom Share: verplichte waarde ontbreekt"
+            "value" : "Kan gegevens van Dexcom Share niet lezen: verplichte waarde ontbreekt"
           }
         },
         "pl" : {
@@ -13097,7 +13097,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imposibil de citit datele din Dexcom: lipsește valoarea necesară"
+            "value" : "Imposibil de citit datele din Dexcom Share: lipsește valoarea necesară"
           }
         },
         "sv" : {
@@ -13125,13 +13125,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No se pueden leer los datos de Dexcom Compartir: Tipo de valor no coincidente."
+            "value" : "No se pueden leer los datos de Dexcom Share: Tipo de valor no coincidente."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Impossible de lire les données de Dexcom Partage : Différence de type valeur."
+            "value" : "Impossible de lire les données de Dexcom Share : Différence de type valeur."
           }
         },
         "it" : {
@@ -13143,7 +13143,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kan de gegevens niet lezen van Dexcom Delen: waarde type komt niet overeen."
+            "value" : "Kan gegevens van Dexcom Share niet lezen: waardetype komt niet overeen."
           }
         },
         "pl" : {
@@ -13155,13 +13155,13 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Imposibil de citit datele din Dexcom: Nepotrivirea tipului de valoare."
+            "value" : "Imposibil de citit datele din Dexcom Share: Nepotrivirea tipului de valoare."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Det går inte att läsa data från Dexcom Dela: Värdetypen matchar inte."
+            "value" : "Det går inte att läsa data från Dexcom Share: Värdetypen matchar inte."
           }
         }
       }
@@ -13201,7 +13201,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kan geen data lezen uit Dexcom: gegevens beschadigd."
+            "value" : "Kan gegevens van Dexcom niet lezen: gegevens beschadigd."
           }
         },
         "pl" : {
@@ -13318,7 +13318,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "onbekend"
+            "value" : "Onbekend"
           }
         },
         "pl" : {
@@ -13358,25 +13358,25 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Problema de compartir Dexcom desconocido"
+            "value" : "Problema desconocido de Dexcom Share"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Problème de partage Dexcom inconnu"
+            "value" : "Problème Dexcom Share inconnu"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Emissione Di Azioni Dexcom Sconosciuta"
+            "value" : "Problema sconosciuto di Dexcom Share"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Onbekend probleem Dexcom Delen"
+            "value" : "Onbekend probleem met Dexcom Share"
           }
         },
         "pl" : {
@@ -13388,13 +13388,13 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Problemă necunoscută de Partajare Dexcom"
+            "value" : "Problemă necunoscută Dexcom Share"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Okänt Dexcom-problem"
+            "value" : "Okänt Dexcom Share-problem"
           }
         }
       }
@@ -13416,25 +13416,25 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Problema de compartir Dexcom desconocido: %lld"
+            "value" : "Problema desconocido de Dexcom Share: %lld"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Problème de partage Dexcom inconnu : %lld"
+            "value" : "Problème Dexcom Share inconnu : %lld"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Problema Sconosciuto Su Azioni Dexcom: %lld"
+            "value" : "Problema sconosciuto di Dexcom Share: %lld"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Onbekend Dexcom Share probleem: %lld"
+            "value" : "Onbekend probleem met Dexcom Share: %lld"
           }
         },
         "pl" : {
@@ -13446,7 +13446,7 @@
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Problemă de partajare necunoscută Dexcom: %lld"
+            "value" : "Problemă necunoscută Dexcom Share: %lld"
           }
         },
         "sv" : {
@@ -13822,7 +13822,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zeer Smalle"
+            "value" : "Zeer smal"
           }
         },
         "pl" : {
@@ -13933,7 +13933,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "We zijn altijd op zoek naar hulp met ideeën, bugfixes en vertalingen. Als u wilt bijdragen, zie dan de GitHub respository."
+            "value" : "We zijn altijd op zoek naar hulp met ideeën, bugfixes en vertalingen. Wil je bijdragen? Kijk dan in de GitHub-repository."
           }
         },
         "pl" : {
@@ -13991,7 +13991,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gewicht"
+            "value" : "Letterdikte"
           }
         },
         "pl" : {
@@ -14102,7 +14102,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ja"
+            "value" : "Ja"
           }
         },
         "pl" : {
@@ -14161,7 +14161,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "U hebt de AID-integratie ingeschakeld, waarmee GlucoseBar u extra gegevens laat zien."
+            "value" : "Je hebt de AID-integratie ingeschakeld, waardoor GlucoseBar extra gegevens kan tonen."
           }
         },
         "pl" : {
@@ -14219,7 +14219,7 @@
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zen Mode"
+            "value" : "Zen-modus"
           }
         },
         "pl" : {

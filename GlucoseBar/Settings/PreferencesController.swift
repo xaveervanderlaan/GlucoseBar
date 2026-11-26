@@ -33,7 +33,7 @@ final class PreferencesController {
         window.collectionBehavior = [.moveToActiveSpace]
         window.identifier = Self.settingsWindowIdentifier
         NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.activate()
         window.orderFrontRegardless()
         window.makeKeyAndOrderFront(nil)
     }

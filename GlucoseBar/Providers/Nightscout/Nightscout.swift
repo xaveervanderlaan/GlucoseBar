@@ -57,6 +57,10 @@ class Nightscout: Provider, @unchecked Sendable {
 
     private var lastFullFetch: Date = Date()
 
+    /// The authentication request currently in flight, if any. Concurrent
+    /// callers wait for it instead of starting a second one.
+    private var authenticationTask: Task<Void, Never>?
+
     var baseURL: String
     var token: String
     var aidEnabled: Bool
@@ -120,21 +124,34 @@ class Nightscout: Provider, @unchecked Sendable {
         socket.disconnect()
     }
 
+    /// Stops the socket and drops its handlers. Previously a replaced
+    /// Nightscout provider was kept alive by its own socket handlers (which
+    /// captured `self` strongly) and kept long-polling the server forever.
+    override func teardown() {
+        socket.removeAllHandlers()
+        manager.reconnects = false
+        manager.disconnect()
+    }
+
     private func registerHandlers() {
-        socket.on(clientEvent: .connect) { _, _ in
+        // Handlers capture `self` weakly: the socket is owned by this provider,
+        // so a strong capture creates a retain cycle that keeps it alive.
+        socket.on(clientEvent: .connect) { [weak self] _, _ in
+            guard let self else { return }
             self.plog("Nightscout socket connected", category: "nightscout", level: .debug)
             self.socket.emit("authorize", ["client": "web", "secret": self.token])
         }
 
-        socket.on(clientEvent: .disconnect) { _, _ in
-            self.plog("Nightscout socket disconnected", category: "nightscout", level: .debug)
+        socket.on(clientEvent: .disconnect) { [weak self] _, _ in
+            self?.plog("Nightscout socket disconnected", category: "nightscout", level: .debug)
         }
 
-        socket.on(clientEvent: .error) { _, _ in
-            self.plog("Nightscout socket error", category: "nightscout", level: .debug)
+        socket.on(clientEvent: .error) { [weak self] _, _ in
+            self?.plog("Nightscout socket error", category: "nightscout", level: .debug)
         }
 
-        socket.on("dataUpdate") { data, _ in
+        socket.on("dataUpdate") { [weak self] data, _ in
+            guard let self else { return }
             self.plog("Nightscout socket got: dataUpdate", category: "nightscout", level: .debug)
 
             // Create a deep, Sendable-safe snapshot of the payload by round-tripping through JSON
@@ -154,8 +171,8 @@ class Nightscout: Provider, @unchecked Sendable {
                 snapshot = []
             }
 
-            Task { @MainActor in
-                await self.handleDataUpdate(snapshot)
+            Task { @MainActor [weak self] in
+                await self?.handleDataUpdate(snapshot)
             }
         }
 
@@ -210,21 +227,15 @@ class Nightscout: Provider, @unchecked Sendable {
             }
 
             let newEntries = nsSocketSGVsToGlucoseEntries(input: recentSGVs, previous: previous)
+            let knownIDs = Set(currentEntries.compactMap(\.id))
             let uniqueNewEntries = newEntries.filter { newEntry in
-                !currentEntries.contains(where: {
-                    $0.id == newEntry.id
-                })
+                guard let id = newEntry.id else { return true }
+                return !knownIDs.contains(id)
             }
 
             if uniqueNewEntries.count > 0 {
                 self.plog("Fetched \(uniqueNewEntries.count) new entries", category: "nightscout", level: .debug)
-                var updatedEntries = currentEntries
-                updatedEntries.insert(contentsOf: newEntries, at: 0)
-
-                if updatedEntries.count > 288 {
-                    self.plog("removing entry from glucoseentries: \(updatedEntries.last!.glucose)", category: "nightscout", level: .debug)
-                    updatedEntries.removeLast()
-                }
+                let updatedEntries = Provider.mergeEntries(uniqueNewEntries, into: currentEntries)
                 self.plog("Latest glucose entry: \(String(describing: updatedEntries.first?.glucose))", category: "nightscout", level: .debug)
                 self.setGlucoseEntries(updatedEntries)
             }
@@ -389,21 +400,15 @@ class Nightscout: Provider, @unchecked Sendable {
                     if lim > 1 {
                         self.setGlucoseEntries(newEntries)
                     } else {
+                        let knownIDs = Set(currentEntries.compactMap(\.id))
                         let uniqueNewEntries = newEntries.filter { newEntry in
-                            !currentEntries.contains(where: {
-                                $0.id == newEntry.id
-                            }
-                            )}
+                            guard let id = newEntry.id else { return true }
+                            return !knownIDs.contains(id)
+                        }
 
                         if uniqueNewEntries.count > 0 {
                             self.plog("Fetched \(uniqueNewEntries.count) new entries", category: "nightscout", level: .debug)
-                            var updatedEntries = currentEntries
-                            updatedEntries.insert(contentsOf: newEntries, at: 0)
-
-                            if updatedEntries.count > 288 {
-                                self.plog("removing entry from glucoseentries: \(updatedEntries.last!.glucose)", category: "nightscout", level: .debug)
-                                updatedEntries.removeLast()
-                            }
+                            let updatedEntries = Provider.mergeEntries(uniqueNewEntries, into: currentEntries)
                             self.plog("Latest glucose entry: \(String(describing: updatedEntries.first?.glucose))", category: "nightscout", level: .debug)
                             self.setGlucoseEntries(updatedEntries)
                         }
@@ -542,15 +547,36 @@ class Nightscout: Provider, @unchecked Sendable {
         return false
     }
 
+    /// Authenticates against Nightscout, or waits for an authentication that
+    /// is already running.
+    ///
+    /// Previously a second caller returned immediately while another
+    /// authentication was in flight. The connection test hit exactly that: the
+    /// provider's initial fetch starts authenticating first, so the test saw
+    /// "not authenticated" and reported invalid credentials even though the
+    /// credentials were fine.
     @MainActor
     private func authenticate() async {
-
-        if isAuthenticating {
-            self.plog("Already authenticating actively. Returning.", category: "nightscout", level: .info)
+        if let inFlight = authenticationTask {
+            self.plog("Authentication already in progress, waiting for it.", category: "nightscout", level: .info)
+            await inFlight.value
             return
         }
 
+        let task = Task { @MainActor in
+            await self.performAuthentication()
+        }
+        authenticationTask = task
+        await task.value
+        authenticationTask = nil
+    }
+
+    @MainActor
+    private func performAuthentication() async {
         isAuthenticating = true
+        // Always clear the flag: several early returns below used to leave it
+        // set, which blocked every later authentication attempt.
+        defer { isAuthenticating = false }
 
         if !baseURL.hasPrefix("https://") && !baseURL.hasPrefix("http://") {
             self.providerIssue = "Invalid Nightscout URL. Must start with either http:// or https://"
@@ -558,7 +584,6 @@ class Nightscout: Provider, @unchecked Sendable {
         }
 
         self.providerIssue = nil
-        self.isAuthenticating = true
 
         self.plog("Nightscout.authenticate", category: "nightscout", level: .debug)
         var request = URLRequest(url: URL(string: "\(baseURL)/api/v2/authorization/request/\(token)")!, timeoutInterval: httpTimeout)
@@ -592,7 +617,6 @@ class Nightscout: Provider, @unchecked Sendable {
                     self.auth = ProviderAuth(token: result.token, expiry: result.exp)
 
                     self.plog("Authentication is successful.", category: "nightscout", level: .debug)
-                    isAuthenticating = false
                     isAuthenticated = true
                     unsuccessfulAuthAttempts = 0
 
@@ -610,7 +634,6 @@ class Nightscout: Provider, @unchecked Sendable {
                 } catch {
                     self.plog("Unable to parse response from Nightscout: \(String(describing: error))", category: "nightscout", level: .error)
                     self.providerIssue = "Unable to parse response from Nightscout: \(String(describing: error))"
-                    isAuthenticating = false
                     return
                 }
             }
@@ -622,8 +645,6 @@ class Nightscout: Provider, @unchecked Sendable {
             self.unsuccessfulAuthAttempts += 1
             self.providerIssue = err
         }
-
-        isAuthenticating = false
     }
 
     override internal func verifyCredentials() async -> Bool {

@@ -43,7 +43,12 @@ func formatCOBForDisplay(cob: Double) -> String {
 }
 
 @MainActor func printFormattedGlucose(settings: SettingsStore, glucose: Double) -> String {
-    if (settings.glucoseUnit == .mmoll) {
+    formattedGlucose(glucose, unit: settings.glucoseUnit)
+}
+
+/// Formats an already unit-converted glucose value with its unit.
+func formattedGlucose(_ glucose: Double, unit: GlucoseUnit) -> String {
+    if unit == .mmoll {
         return String(format: "%.1f mmol/L", glucose)
     }
 

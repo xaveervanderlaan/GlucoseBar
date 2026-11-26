@@ -8,14 +8,17 @@
 import Foundation
 import SwiftUI
 
-func relativeTime(time: Date) -> String {
+@MainActor private let relativeTimeFormatter: RelativeDateTimeFormatter = {
     let formatter = RelativeDateTimeFormatter()
     formatter.unitsStyle = .short
     formatter.formattingContext = .middleOfSentence
+    return formatter
+}()
 
+@MainActor func relativeTime(time: Date) -> String {
     if time.timeIntervalSinceNow > -60 {
         return String(localized: "< 1 min. ago", comment: "Used for relative time throughout the application when the elapsed time is less than a minute")
     }
 
-    return formatter.localizedString(for: time, relativeTo: Date())
+    return relativeTimeFormatter.localizedString(for: time, relativeTo: Date())
 }
